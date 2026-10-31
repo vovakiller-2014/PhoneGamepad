@@ -1,0 +1,67 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000"><title>Геймпад</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;font-family:system-ui,sans-serif}
+.el{position:absolute;transform:translate(-50%,-50%);box-sizing:border-box;border:2px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-weight:600;touch-action:none}
+.btn{border-radius:50%}.pill{border-radius:14px}
+.el.on{background:color-mix(in srgb,var(--c) 35%,transparent)}
+.stick{border-radius:50%;border-style:dashed;opacity:.8}
+.knob{width:42%;height:42%;border-radius:50%;border:2px solid var(--c);position:absolute;pointer-events:none}
+.sel{outline:2px dotted #fff}
+#bar{position:fixed;top:6px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:9;opacity:.5}
+#bar *{background:#000;color:#aaa;border:1px solid #444;border-radius:8px;padding:5px 9px;font-size:13px}
+#ed{display:none}
+body.edit #ed{display:flex}body.edit .el{border-style:dotted}
+#st{position:fixed;bottom:4px;right:8px;color:#555;font-size:11px}
+</style></head><body>
+<div id="bar"><select id="prof"></select><button id="edit">✎</button>
+<span id="ed" style="gap:6px;padding:0;border:0"><button id="mn">−</button><button id="pl">+</button><input id="col" type="color"><button id="sv">Зберегти</button><button id="nw">Новий</button><button id="rs">Скинути</button></span></div>
+<div id="st"></div>
+<script>
+const C={A:'#2ecc71',B:'#e74c3c',X:'#3498db',Y:'#f1c40f'},W='#ddd';
+const DEF=[
+{k:'LT',t:'tr',l:'LT',x:8,y:22,w:13,h:8,c:W},{k:'LB',t:'b',l:'LB',x:8,y:34,w:13,h:8,c:W},
+{k:'RT',t:'tr',l:'RT',x:92,y:22,w:13,h:8,c:W},{k:'RB',t:'b',l:'RB',x:92,y:34,w:13,h:8,c:W},
+{k:'L',t:'s',x:17,y:68,w:30,c:W},{k:'R',t:'s',x:62,y:78,w:26,c:W},
+{k:'UP',t:'b',l:'▲',x:38,y:52,w:9,c:W},{k:'DOWN',t:'b',l:'▼',x:38,y:82,w:9,c:W},
+{k:'LEFT',t:'b',l:'◀',x:31,y:67,w:9,c:W},{k:'RIGHT',t:'b',l:'▶',x:45,y:67,w:9,c:W},
+{k:'BACK',t:'b',l:'⧉',x:42,y:30,w:8,c:W,p:1},{k:'START',t:'b',l:'☰',x:58,y:30,w:8,c:W,p:1},
+{k:'Y',t:'b',l:'Y',x:86,y:46,w:11,c:C.Y},{k:'A',t:'b',l:'A',x:86,y:76,w:11,c:C.A},
+{k:'X',t:'b',l:'X',x:77,y:61,w:11,c:C.X},{k:'B',t:'b',l:'B',x:95,y:61,w:11,c:C.B}];
+const P=new URLSearchParams(location.search).get('pin')||prompt('PIN з ПК');
+let ws;function conn(){ws=new WebSocket(`ws://${location.host}/ws?pin=${P}`);
+ws.onopen=()=>st.textContent='● підключено';ws.onclose=()=>{st.textContent='○ немає зв’язку';setTimeout(conn,1500)}}conn();
+const tx=o=>ws.readyState==1&&ws.send(JSON.stringify(o));
+let profs=JSON.parse(localStorage.gp||'null')||{'Xbox':DEF},cur=localStorage.gpc||'Xbox',L,sel=null,edit=false;
+const save=()=>{localStorage.gp=JSON.stringify(profs);localStorage.gpc=cur};
+function fill(){prof.innerHTML=Object.keys(profs).map(n=>`<option ${n==cur?'selected':''}>${n}</option>`).join('')}
+function build(){document.querySelectorAll('.el').forEach(e=>e.remove());L=profs[cur];L.forEach(mk)}
+function mk(o){const e=document.createElement('div');e.className='el '+(o.t=='s'?'stick':o.p?'pill btn':'btn');o.e=e;
+if(o.t=='s')e.innerHTML='<div class="knob"></div>';else e.textContent=o.l;
+const pos=()=>{const u=Math.min(innerWidth,innerHeight)/100;e.style.cssText=`left:${o.x}%;top:${o.y}%;width:${o.w*u*(o.t=='s'?1:1)}px;height:${o.w*u*(o.p?.6:1)}px;--c:${o.c}`;if(o.t=='tr'||o.k=='LB'||o.k=='RB')e.style.borderRadius='14px'};
+o.pos=pos;pos();document.body.appendChild(e);
+let sx,sy,ox,oy;
+e.onpointerdown=ev=>{e.setPointerCapture(ev.pointerId);
+if(edit){sel=o;document.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));e.classList.add('sel');col.value=o.c.length==7?o.c:'#dddddd';sx=ev.clientX;sy=ev.clientY;ox=o.x;oy=o.y;return}
+e.classList.add('on');if(o.t=='b')tx({t:'b',k:o.k,v:1});if(o.t=='tr')tx({t:'tr',k:o.k,v:1});if(o.t=='s')mv(ev)};
+function mv(ev){const r=e.getBoundingClientRect(),R=r.width/2;let dx=ev.clientX-r.left-R,dy=ev.clientY-r.top-R,d=Math.hypot(dx,dy);if(d>R){dx*=R/d;dy*=R/d}
+const k=e.firstChild;k.style.left=(50+dx/r.width*100-21)+'%';k.style.top=(50+dy/r.width*100-21)+'%';tx({t:'s',k:o.k,x:+(dx/R).toFixed(3),y:+(dy/R).toFixed(3)})}
+e.onpointermove=ev=>{if(edit){if(sx==null)return;o.x=Math.max(0,Math.min(100,ox+(ev.clientX-sx)/innerWidth*100));o.y=Math.max(0,Math.min(100,oy+(ev.clientY-sy)/innerHeight*100));pos();return}
+if(o.t=='s'&&e.classList.contains('on'))mv(ev)};
+e.onpointerup=e.onpointercancel=()=>{if(edit){sx=null;return}e.classList.remove('on');
+if(o.t=='b')tx({t:'b',k:o.k,v:0});if(o.t=='tr')tx({t:'tr',k:o.k,v:0});
+if(o.t=='s'){e.firstChild.style.left=e.firstChild.style.top='29%';tx({t:'s',k:o.k,x:0,y:0})}};
+if(o.t=='s')e.firstChild.style.left=e.firstChild.style.top='29%'}
+prof.onchange=()=>{cur=prof.value;save();build()};
+document.getElementById("edit").onclick=()=>{edit=!edit;document.body.classList.toggle('edit',edit);if(!edit){sel=null;save()}};
+const sz=d=>{if(sel){sel.w=Math.max(5,sel.w+d);sel.pos()}};mn.onclick=()=>sz(-1);pl.onclick=()=>sz(1);
+col.oninput=()=>{if(sel){sel.c=col.value;sel.pos()}};
+const clean=a=>a.map(({e,pos,...r})=>r);
+sv.onclick=()=>{profs[cur]=clean(L);save()};
+nw.onclick=()=>{const n=prompt('Назва профілю');if(!n)return;profs[n]=clean(L);cur=n;save();fill();build()};
+rs.onclick=()=>{profs[cur]=JSON.parse(JSON.stringify(DEF));save();build()};
+const go=async()=>{try{await document.documentElement.requestFullscreen();await screen.orientation.lock('landscape')}catch{}try{await navigator.wakeLock.request('screen')}catch{}};
+addEventListener('pointerdown',go,{once:true});addEventListener('resize',()=>L.forEach(o=>o.pos()));
+fill();build();
+</script></body></html>
