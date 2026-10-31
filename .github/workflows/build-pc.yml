@@ -17,7 +17,7 @@ jobs:
           tar -xzf vg.tar.gz
           $sp = python -c "import site; print(site.getsitepackages()[0])"
           Copy-Item vgamepad-0.2.0\vgamepad "$sp\vgamepad" -Recurse
-          python -c "import vgamepad; print('vgamepad ok')"
+          Get-ChildItem "$sp\vgamepad" -Recurse -Filter *.dll | ForEach-Object { $_.FullName }
       - run: pyinstaller --onefile --noconsole --name PhoneGamepad --add-data "index.html;." --collect-data vgamepad --collect-binaries vgamepad pcapp.py
       - uses: actions/upload-artifact@v4
         with:
