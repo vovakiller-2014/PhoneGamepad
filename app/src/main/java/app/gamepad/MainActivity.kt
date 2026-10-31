@@ -26,8 +26,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.codescanner.barcode.GmsBarcodeScanning
-
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 class MainActivity : Activity() {
     private lateinit var web: WebView
     private lateinit var form: View
