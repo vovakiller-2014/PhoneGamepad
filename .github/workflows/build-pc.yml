@@ -1,7 +1,7 @@
 name: Build PC exe
 on:
   push:
-    branches: [pc]
+    branches: [PCApp]
   workflow_dispatch:
 jobs:
   build:
