@@ -10,8 +10,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install vgamepad aiohttp "qrcode[pil]" pyinstaller
-      - run: pyinstaller --onefile --noconsole --name PhoneGamepad --add-data "index.html;." --collect-all vgamepad pcapp.py
+      - name: Install deps
+        run: |
+          pip install aiohttp "qrcode[pil]" pyinstaller enum-compat
+          Invoke-WebRequest https://files.pythonhosted.org/packages/source/v/vgamepad/vgamepad-0.2.0.tar.gz -OutFile vg.tar.gz
+          tar -xzf vg.tar.gz
+          $sp = python -c "import site; print(site.getsitepackages()[0])"
+          Copy-Item vgamepad-0.2.0\vgamepad "$sp\vgamepad" -Recurse
+          python -c "import vgamepad; print('vgamepad ok')"
+      - run: pyinstaller --onefile --noconsole --name PhoneGamepad --add-data "index.html;." --collect-data vgamepad --collect-binaries vgamepad pcapp.py
       - uses: actions/upload-artifact@v4
         with:
           name: PhoneGamepad-exe
