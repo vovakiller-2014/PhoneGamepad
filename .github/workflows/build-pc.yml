@@ -12,7 +12,7 @@ jobs:
         with: { python-version: "3.12" }
       - name: Install deps
         run: |
-          pip install aiohttp "qrcode[pil]" pyinstaller enum-compat
+          pip install aiohttp "qrcode[pil]" pyinstaller enum-compat pyserial
           Invoke-WebRequest https://files.pythonhosted.org/packages/source/v/vgamepad/vgamepad-0.2.0.tar.gz -OutFile vg.tar.gz
           tar -xzf vg.tar.gz
           $sp = python -c "import site; print(site.getsitepackages()[0])"
