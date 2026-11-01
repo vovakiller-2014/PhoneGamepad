@@ -1,0 +1,136 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Gamepad</title><style>
+@property --a{syntax:'<angle>';initial-value:0deg;inherits:false}
+@keyframes r{to{--a:360deg}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:#000;color:#ddd;font-family:system-ui,sans-serif;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+#home{position:absolute;inset:0;overflow:auto;padding:max(14px,env(safe-area-inset-top)) 16px 28px;touch-action:pan-y}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px}
+h1{font-size:22px;margin:0;font-weight:600}h2{font-size:14px;color:#888;font-weight:500;margin:18px 0 8px}
+.tb{display:flex;gap:6px}
+.pb{border:1px solid #444;border-radius:18px;padding:8px 14px;background:none;color:#ddd;font-size:14px}
+.pb.on{border-color:#2ecc71;color:#2ecc71}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{border:2px solid #262626;border-radius:16px;padding:8px;background:#0a0a0a}
+.card.sel{border-color:transparent;background:linear-gradient(#0a0a0a,#0a0a0a) padding-box,conic-gradient(from var(--a),#f33,#fc0,#3f6,#0cf,#93f,#f33) border-box;animation:r 4s linear infinite}
+.pv{position:relative;height:80px;border-radius:10px;background:#040404;overflow:hidden}
+.pv i{position:absolute;border:1.5px solid;border-radius:50%;transform:translate(-50%,-50%)}
+.nm{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:15px}
+.nm b{font-weight:500}.ed{padding:2px 8px;color:#888;font-size:18px}
+.add{display:flex;align-items:center;justify-content:center;min-height:120px;color:#888;font-size:15px;border-style:dashed}
+#pl{position:fixed;inset:0;background:#000}
+.el{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-weight:600;touch-action:none}
+.rd{border-radius:50%}.sh{border-radius:14px}.stick{border-style:dashed;opacity:.85}.wheel{border-width:3px}
+.el.on{background:color-mix(in srgb,var(--c) 30%,transparent)}.el.sel{outline:2px dotted #fff;outline-offset:3px}
+.kn{position:absolute;width:42%;height:42%;border:2px solid var(--c);border-radius:50%;pointer-events:none}
+.wh{position:absolute;inset:6%;border-radius:50%;border:2px solid var(--c);opacity:.7;pointer-events:none}
+.wh::after{content:'';position:absolute;left:50%;top:-2px;width:3px;height:22%;margin-left:-1.5px;background:var(--c)}
+#eb{position:fixed;left:0;right:0;display:flex;gap:6px;padding:6px 8px;background:rgba(10,10,10,.92);overflow-x:auto;z-index:10;align-items:center}
+#eb *,.mb input{background:#111;color:#ddd;border:1px solid #444;border-radius:8px;padding:6px 8px;font-size:13px;min-width:0}
+#eb input[type=color]{padding:0;width:34px;height:30px}#eb input[type=number]{width:62px}#eb input[size="3"]{width:56px}
+#eb .sv{border-color:#2ecc71;color:#2ecc71}
+#cm{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:20}
+.mb{background:#0d0d0d;border:1px solid #333;border-radius:16px;padding:16px;width:min(92vw,380px);max-height:90vh;overflow:auto;touch-action:pan-y}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.mb input{display:block;width:100%;margin-bottom:8px;padding:10px}
+.mb .pb{margin:0 6px 8px 0}.mb p{color:#999;font-size:14px}#ms{color:#f66;font-size:13px;margin-top:6px}
+</style></head><body>
+<div id="home"></div><div id="pl" hidden></div><div id="eb" hidden></div><div id="cm" hidden></div>
+<script>
+const A=window.Android||null,$=s=>document.querySelector(s),U=()=>Math.random().toString(36).slice(2,8),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const L={ua:{conn:'Підключення',lay:'Розкладки',cust:'Власні розкладки',nw:'Нова розкладка',save:'Зберегти',del:'Видалити',rst:'Скинути',lbl:'Текст',go:'Підключитись',scan:'Сканувати QR',noperm:'Потрібен дозвіл Bluetooth. Дозволь і натисни ↻',btoff:'Увімкни Bluetooth і натисни ↻',nodev:'Немає спарених пристроїв. Спаруй ПК у налаштуваннях телефона',btn:'Кнопка',stick:'Стік',wheel:'Кермо',tilt:'Нахил',xbox:'Xbox',ps:'PlayStation',rw:'Гонки: кермо',rt:'Гонки: нахил',fail:'Не вдалося підключитись'},
+en:{conn:'Connect',lay:'Layouts',cust:'Custom layouts',nw:'New layout',save:'Save',del:'Delete',rst:'Reset',lbl:'Text',go:'Connect',scan:'Scan QR',noperm:'Bluetooth permission needed. Allow it and tap ↻',btoff:'Turn Bluetooth on and tap ↻',nodev:'No paired devices. Pair your PC in phone settings',btn:'Button',stick:'Stick',wheel:'Wheel',tilt:'Tilt',xbox:'Xbox',ps:'PlayStation',rw:'Racing: wheel',rt:'Racing: tilt',fail:'Connection failed'}};
+const S={lang:'ua',hap:true,cur:'ps',profs:null,ip:'',pin:''};
+try{Object.assign(S,JSON.parse(localStorage.gp2))}catch(e){}
+const t=k=>L[S.lang][k]||k,save=()=>{try{localStorage.gp2=JSON.stringify(S)}catch(e){}};
+const XB='LT:8:22:13 LB:8:34:13 RT:92:22:13 RB:92:34:13 L:17:68:30 R:62:78:26 UP:38:52:9 DOWN:38:82:9 LEFT:31:67:9 RIGHT:45:67:9 BACK:42:30:8 START:58:30:8 Y:86:46:11 A:86:76:11 X:77:61:11 B:95:61:11';
+const PS='LT:8:9:13 LB:8:21:13 RT:92:9:13 RB:92:21:13 UP:14:34:9 DOWN:14:60:9 LEFT:6:47:9 RIGHT:22:47:9 L:36:74:26 R:64:74:26 BACK:42:20:8 START:58:20:8 Y:86:34:11 A:86:64:11 X:77:49:11 B:95:49:11';
+const AR={UP:'▲',DOWN:'▼',LEFT:'◀',RIGHT:'▶',BACK:'⧉',START:'☰'},SY={A:'✕',B:'○',X:'□',Y:'△'};
+const XC={A:'#2ecc71',B:'#e74c3c',X:'#3498db',Y:'#f1c40f'},PC={A:'#5b8def',B:'#e74c3c',X:'#e87bbd',Y:'#2ecc71'};
+function lay(s,ps,mid){return s.split(' ').map(q=>{const[k,x,y,w]=q.split(':');let ty='btn',l=(ps&&SY[k])||AR[k]||k,c=(ps?PC:XC)[k]||'#dddddd',p1=0,p2=0,W=+w;
+ if(k=='L'){ty=mid;l='';if(mid=='wheel'){p1=180;p2=300;W=40}if(mid=='tilt'){p1=35;W=20}}if(k=='R'){ty='stick';l=''}
+ return{id:U(),t:ty,k,l,x:+x,y:+y,w:W,c,p1,p2}})}
+const DEFS=()=>[{id:'xbox',nk:'xbox',els:lay(XB,0,'stick')},{id:'ps',nk:'ps',els:lay(PS,1,'stick')},{id:'rw',nk:'rw',els:lay(PS,1,'wheel')},{id:'rt',nk:'rt',els:lay(PS,1,'tilt')}];
+if(!S.profs)S.profs=DEFS();
+const dn=p=>p.nk?t(p.nk):p.name;
+let view='home',RT={},ED=null,link={kind:'',send(){}},ws=null,hb=0,tab='wifi';
+const send=o=>{try{link.send(o)}catch(e){}};
+const tiltOn=on=>{if(A)A.tilt(!!on)};
+function tgl(k){if(k=='lang')S.lang=S.lang=='ua'?'en':'ua';else S.hap=!S.hap;save();home()}
+function card(p){return`<div class="card ${p.id==S.cur?'sel':''}" onclick="play('${p.id}')"><div class=pv>${p.els.map(e=>{const z=Math.max(5,e.w*.8);return`<i style="left:${e.x}%;top:${e.y}%;width:${z}px;height:${z}px;border-color:${e.c}"></i>`}).join('')}</div><div class=nm><b>${esc(dn(p))}</b><span class=ed onclick="event.stopPropagation();edit('${p.id}')">✎</span></div></div>`}
+function home(){view='home';if(A)A.orient(false);tiltOn(0);$('#pl').hidden=$('#eb').hidden=true;const h=$('#home');h.hidden=false;
+ h.innerHTML=`<div class=top><h1>Gamepad</h1><div class=tb><button class=pb onclick="tgl('lang')">${S.lang.toUpperCase()}</button><button class="pb ${S.hap?'on':''}" onclick="tgl('hap')">📳</button><button class="pb ${link.kind?'on':''}" onclick=conn()>${link.kind?'● '+(link.kind=='bt'?'Bluetooth':'Wi-Fi'):t('conn')}</button></div></div><h2>${t('lay')}</h2><div class=grid>${S.profs.filter(p=>p.nk).map(card).join('')}</div><h2>${t('cust')}</h2><div class=grid>${S.profs.filter(p=>!p.nk).map(card).join('')}<div class="card add" onclick=newP()>＋ ${t('nw')}</div></div>`}
+function play(id){S.cur=id;save();view='play';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;$('#eb').hidden=true;render(S.profs.find(p=>p.id==id),false)}
+function render(p,ed){const pl=$('#pl');pl.innerHTML='';RT={};p.els.forEach(e=>pl.appendChild(mkEl(e,ed)));tiltOn(!ed&&p.els.some(e=>e.t=='tilt'))}
+function mkEl(e,ed){const d=document.createElement('div'),u=Math.min(innerWidth,innerHeight)/100,sh=e.t=='btn'&&['LT','RT','LB','RB','BACK','START'].includes(e.k);
+ d.className='el '+(e.t=='btn'?(sh?'sh':'rd'):'rd '+e.t);
+ const sz=()=>{d.style.cssText=`left:${e.x}%;top:${e.y}%;width:${e.w*u}px;height:${e.w*u*(sh?.6:1)}px;--c:${e.c};font-size:${e.w*u*.38}px`};sz();
+ if(e.t=='btn')d.textContent=e.l;if(e.t=='stick')d.innerHTML='<b class=kn></b>';if(e.t=='wheel'||e.t=='tilt')d.innerHTML='<b class=wh></b>';
+ const R=RT[e.id]={d,sz,ang:0};ed?editBind(e,d,R):playBind(e,d,R);return d}
+function playBind(e,d,R){
+ if(e.t=='btn'){const tr=e.k=='LT'||e.k=='RT',m=v=>tr?{t:'tr',k:e.k,v}:{t:'b',k:e.k,v};
+  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');if(S.hap&&A)A.vibrate(12);send(m(1))};
+  d.onpointerup=d.onpointercancel=()=>{d.classList.remove('on');send(m(0))}}
+ else if(e.t=='stick'){const kn=d.firstChild;kn.style.left=kn.style.top='29%';
+  const mv=ev=>{const r=d.getBoundingClientRect(),h=r.width/2;let dx=ev.clientX-r.left-h,dy=ev.clientY-r.top-h,m=Math.hypot(dx,dy);if(m>h){dx*=h/m;dy*=h/m}
+   kn.style.left=(50+dx/r.width*100-21)+'%';kn.style.top=(50+dy/r.width*100-21)+'%';send({t:'s',k:e.k,x:+(dx/h).toFixed(3),y:+(dy/h).toFixed(3)})};
+  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');mv(ev)};
+  d.onpointermove=ev=>{if(d.classList.contains('on'))mv(ev)};
+  d.onpointerup=d.onpointercancel=()=>{d.classList.remove('on');kn.style.left=kn.style.top='29%';send({t:'s',k:e.k,x:0,y:0})}}
+ else if(e.t=='wheel'){const wh=d.firstChild;let last=null,raf=0;const mx=Math.abs(e.p1)||180;
+  const out=()=>{wh.style.transform=`rotate(${R.ang}deg)`;send({t:'s',k:e.k,x:+(R.ang/mx).toFixed(3),y:0})};
+  const ang=ev=>{const r=d.getBoundingClientRect();return Math.atan2(ev.clientY-r.top-r.height/2,ev.clientX-r.left-r.width/2)*180/Math.PI};
+  d.onpointerdown=ev=>{cancelAnimationFrame(raf);d.setPointerCapture(ev.pointerId);last=ang(ev)};
+  d.onpointermove=ev=>{if(last==null)return;const a=ang(ev);let dl=a-last;if(dl>180)dl-=360;if(dl<-180)dl+=360;last=a;R.ang=cl(R.ang+dl,-mx,mx);out()};
+  d.onpointerup=d.onpointercancel=()=>{last=null;if(!e.p2)return;let t0=performance.now();const f=t=>{const s=e.p2*(t-t0)/1000;t0=t;if(Math.abs(R.ang)<=s){R.ang=0;out();return}R.ang-=Math.sign(R.ang)*s;out();raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f)}}
+ else if(e.t=='tilt'){const wh=d.firstChild,rg=e.p1||35;R.base=null;
+  R.tl=a=>{if(R.base==null)R.base=a;const dl=((a-R.base+540)%360)-180,x=cl(dl/rg,-1,1);wh.style.transform=`rotate(${x*Math.abs(rg)}deg)`;send({t:'s',k:e.k,x:+x.toFixed(3),y:0})};
+  d.onpointerdown=()=>{R.base=null}}}
+window.onTilt=(ax,ay)=>{const a=Math.atan2(ay,ax)*180/Math.PI;for(const id in RT)if(RT[id].tl)RT[id].tl(a)};
+/* ---------- editor ---------- */
+const KEYS=['A','B','X','Y','LB','RB','LT','RT','BACK','START','LS','RS','UP','DOWN','LEFT','RIGHT'];
+function edit(id){const p=S.profs.find(x=>x.id==id);ED={id,p:JSON.parse(JSON.stringify(p)),sel:null};view='edit';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;render(ED.p,true);bar()}
+function editBind(e,d,R){let sx=null,sy,ox,oy;
+ d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);ED.sel=e;sx=ev.clientX;sy=ev.clientY;ox=e.x;oy=e.y;bar()};
+ d.onpointermove=ev=>{if(sx==null)return;e.x=cl(ox+(ev.clientX-sx)/innerWidth*100,0,100);e.y=cl(oy+(ev.clientY-sy)/innerHeight*100,0,100);R.sz()};
+ d.onpointerup=d.onpointercancel=()=>{sx=null}}
+function bar(){const b=$('#eb'),e=ED.sel,low=e&&e.y<50;b.hidden=false;b.style.top=low?'auto':'0';b.style.bottom=low?'0':'auto';
+ document.querySelectorAll('.el.sel').forEach(x=>x.classList.remove('sel'));if(e)RT[e.id].d.classList.add('sel');
+ const opt=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
+ let h=`<input value="${esc(dn(ED.p))}" size=9 oninput="ED.p.name=this.value;delete ED.p.nk"><select id=at>${['btn','stick','wheel','tilt'].map(x=>`<option value=${x}>${t(x)}</option>`).join('')}</select><button onclick=addE()>＋</button>`;
+ if(e){h+=e.t=='btn'?`<input size=3 value="${esc(e.l)}" placeholder="${t('lbl')}" oninput="upd('l',this.value)"><select onchange="upd('k',this.value)">${opt(KEYS,e.k)}</select>`:`<select onchange="upd('k',this.value)">${opt(['L','R'],e.k)}</select>`;
+  h+=`<input type=color value="${e.c}" oninput="upd('c',this.value)"><button onclick="sz(-1)">−</button><button onclick="sz(1)">+</button>`;
+  if(e.t=='wheel')h+=`<input type=number value=${e.p1} oninput="upd('p1',+this.value)"><input type=number value=${e.p2} oninput="upd('p2',+this.value)">`;
+  if(e.t=='tilt')h+=`<input type=number value=${e.p1} oninput="upd('p1',+this.value)">`;h+=`<button onclick=delE()>🗑</button>`}
+ h+=`<button class=sv onclick=saveE()>${t('save')}</button><button onclick=home()>✕</button>`+(ED.p.nk?`<button onclick=rstE()>${t('rst')}</button>`:`<button onclick=delP()>${t('del')}</button>`);b.innerHTML=h}
+function upd(f,v){const e=ED.sel;e[f]=v;if(f=='k'){render(ED.p,true);bar()}else{const R=RT[e.id];if(f=='l')R.d.textContent=v;else R.sz()}}
+function sz(d){const e=ED.sel;if(e){e.w=Math.max(5,e.w+d*2);RT[e.id].sz()}}
+function addE(){const ty=$('#at').value,e={id:U(),t:ty,k:ty=='btn'?'A':'L',l:ty=='btn'?'●':'',x:50,y:50,w:ty=='btn'?11:ty=='wheel'?36:ty=='tilt'?20:26,c:'#dddddd',p1:ty=='wheel'?180:ty=='tilt'?35:0,p2:ty=='wheel'?300:0};ED.p.els.push(e);ED.sel=e;render(ED.p,true);bar()}
+function delE(){ED.p.els=ED.p.els.filter(x=>x!=ED.sel);ED.sel=null;render(ED.p,true);bar()}
+function saveE(){const i=S.profs.findIndex(x=>x.id==ED.id);S.profs[i]=ED.p;save();home()}
+function rstE(){ED.p=DEFS().find(x=>x.id==ED.id);ED.sel=null;render(ED.p,true);bar()}
+function delP(){S.profs=S.profs.filter(x=>x.id!=ED.id);if(S.cur==ED.id)S.cur='ps';save();home()}
+function newP(){const n=S.profs.filter(p=>!p.nk).length+1,p={id:U(),name:'Custom '+n,els:JSON.parse(JSON.stringify(S.profs.find(x=>x.id=='ps').els))};S.profs.push(p);save();edit(p.id)}
+/* ---------- connection ---------- */
+function msg(s){const m=$('#ms');if(m)m.textContent=s}
+function closeLink(){if(ws){const w=ws;ws=null;w.close()}if(A)A.btClose();clearInterval(hb);link={kind:'',send(){}}}
+function conn(){if(link.kind){closeLink();home();return}cm(1)}
+function cm(on){const m=$('#cm');m.hidden=!on;if(!on)return;
+ m.innerHTML=`<div class=mb><div class=tabs><button class="pb ${tab=='wifi'?'on':''}" onclick="tab='wifi';cm(1)">Wi-Fi</button><button class="pb ${tab=='bt'?'on':''}" onclick="tab='bt';cm(1)">Bluetooth</button><button class=pb onclick=cm(0)>✕</button></div><div id=mc></div><div id=ms></div></div>`;
+ if(tab=='wifi')$('#mc').innerHTML=`<input id=ip placeholder="IP" value="${esc(S.ip)}"><input id=pn placeholder=PIN inputmode=numeric value="${esc(S.pin)}"><button class="pb on" onclick=goW()>${t('go')}</button>${A?`<button class=pb onclick=A.scanQr()>${t('scan')}</button>`:''}`;
+ else btList()}
+function btList(){const r=A?A.btDevices():'[]',s=$('#mc'),rf=`<button class=pb onclick=cm(1)>↻</button>`;
+ if(r=='NOPERM')return s.innerHTML=`<p>${t('noperm')}</p>${rf}`;if(r=='OFF')return s.innerHTML=`<p>${t('btoff')}</p>${rf}`;
+ const d=JSON.parse(r);s.innerHTML=d.length?d.map(x=>`<button class=pb onclick="btc('${x.a}')">${esc(x.n)}</button>`).join(''):`<p>${t('nodev')}</p>${rf}`}
+function btc(a){closeLink();A.btConnect(a);msg('…')}
+function goW(){S.ip=$('#ip').value.trim();S.pin=$('#pn').value.trim();save();wifi(S.ip,S.pin)}
+function wifi(host,pin){closeLink();const t0=Date.now();let w;try{w=ws=new WebSocket(`ws://${host.includes(':')?host:host+':8080'}/ws?pin=${pin}`)}catch(e){return msg(t('fail'))}
+ w.onopen=()=>{link={kind:'wifi',send:o=>w.readyState==1&&w.send(JSON.stringify(o))};cm(0);if(view=='home')home()};
+ w.onclose=()=>{if(ws!==w)return;const was=link.kind=='wifi';link={kind:'',send(){}};ws=null;if(was&&Date.now()-t0<1500)cm(1),msg(t('fail'));else msg(t('fail'));if(view=='home')home()};}
+window.onLink=k=>{clearInterval(hb);if(k=='bt'){link={kind:'bt',send:o=>A.btSend(JSON.stringify(o))};hb=setInterval(()=>send({t:'hb',k:''}),1000);cm(0)}else{link={kind:'',send(){}};if(!$('#cm').hidden)msg(t('fail'))}if(view=='home')home()};
+window.onQr=u=>{try{const x=new URL(u);S.ip=x.host;S.pin=x.searchParams.get('pin')||'';save();tab='wifi';cm(1);wifi(S.ip,S.pin)}catch(e){msg(t('fail'))}};
+window.onBack=()=>{if(!$('#cm').hidden)cm(0);else if(view!='home')home();else if(A)A.exit()};
+home();
+</script></body></html>
