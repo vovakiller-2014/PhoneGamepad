@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -59,6 +60,10 @@ class MainActivity : Activity() {
         @JavascriptInterface fun orient(land: Boolean) = runOnUiThread {
             requestedOrientation = if (land) ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             else ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+        }
+
+        @JavascriptInterface fun share(s: String) = runOnUiThread {
+            startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, s), null))
         }
 
         @JavascriptInterface fun exit() = runOnUiThread { finish() }
