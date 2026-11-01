@@ -64,27 +64,40 @@ def acquire(label):
 def release(sl):
     pad, sl.pad, sl.ws = sl.pad, None, None; del pad
 
+def blog(msg):
+    try:
+        with open(APP_DIR / 'bt.log', 'a', encoding='utf-8') as f:
+            f.write(time.strftime('%H:%M:%S ') + msg + '\n')
+    except Exception: pass
+
 def bt_reader(port):
     while port in BT:
         try: ser = serial.Serial(port, 115200, timeout=1)
-        except Exception: time.sleep(2); continue
-        sl, last, buf = None, 0, b''
+        except Exception as e:
+            blog(f'open fail {port}: {e}'); time.sleep(2); continue
+        blog(f'open ok {port}')
+        sl, last, buf, errs = None, 0, b'', 0
         while port in BT:
-            try: data = ser.read(512)
-            except Exception: break
+            try: data = ser.read(512); errs = 0
+            except Exception as e:
+                errs += 1; blog(f'read err {errs}: {e}')
+                if errs > 20: break
+                time.sleep(0.5); continue
             now = time.time()
             if data:
                 buf += data; last = now
                 *lines, buf = buf.split(b'\n')
                 for ln in lines:
                     if not ln.strip(): continue
-                    if sl is None: sl = acquire('BT ' + port)
+                    if sl is None:
+                        sl = acquire('BT ' + port); blog(f'phone connected, slot={sl is not None}')
                     if sl is None: continue
                     try: apply(sl, json.loads(ln))
-                    except Exception: pass
+                    except Exception as e: blog(f'apply err: {e}')
             elif sl is not None and now - last > 4:
-                release(sl); sl = None
+                blog('no data 4s, release'); release(sl); sl = None
         if sl is not None: release(sl)
+        blog(f'close {port}')
         try: ser.close()
         except Exception: pass
 
