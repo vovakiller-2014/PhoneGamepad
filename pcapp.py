@@ -1,11 +1,17 @@
 # Phone Gamepad — програма для ПК (потрібен драйвер ViGEmBus)
-import asyncio, json, os, random, socket, sys, threading
+import asyncio, json, os, random, socket, sys, threading, time
 import tkinter as tk
 from tkinter import ttk, messagebox
 from pathlib import Path
 from aiohttp import web
-import vgamepad as vg, qrcode
+import qrcode
 from PIL import ImageTk
+try:
+    import vgamepad as vg
+except Exception as e:
+    _r = tk.Tk(); _r.withdraw()
+    messagebox.showerror('Phone Gamepad', 'Не вдалося запустити геймпад. Чи встановлено драйвер ViGEmBus?\n\n' + str(e))
+    sys.exit(1)
 
 PORT = 8080
 TYPES = ['Xbox 360', 'PlayStation (DS4)']
@@ -38,6 +44,49 @@ class Slot:
     def __init__(s): s.pad = None; s.ws = None; s.ip = ''; s.ds = False; s.dp = set()
 slots = [Slot() for _ in range(8)]
 LOOP, ERR = [], []
+LOCK = threading.Lock()
+try:
+    import serial, serial.tools.list_ports as lp
+except Exception:
+    serial = lp = None
+BT = set(cfg.get('bt', []))
+
+def acquire(label):
+    with LOCK:
+        i = next((n for n, x in enumerate(slots) if x.pad is None), None)
+        if i is None: return None
+        sl = slots[i]; sl.ds = cfg['types'][i] == TYPES[1]; sl.dp = set()
+        try: sl.pad = vg.VDS4Gamepad() if sl.ds else vg.VX360Gamepad()
+        except Exception as e:
+            ERR.append('Не вдалося створити геймпад.\n' + str(e)); return None
+        sl.ip = label; return sl
+
+def release(sl):
+    pad, sl.pad, sl.ws = sl.pad, None, None; del pad
+
+def bt_reader(port):
+    while port in BT:
+        try: ser = serial.Serial(port, 115200, timeout=1)
+        except Exception: time.sleep(2); continue
+        sl, last, buf = None, 0, b''
+        while port in BT:
+            try: data = ser.read(512)
+            except Exception: break
+            now = time.time()
+            if data:
+                buf += data; last = now
+                *lines, buf = buf.split(b'\n')
+                for ln in lines:
+                    if not ln.strip(): continue
+                    if sl is None: sl = acquire('BT ' + port)
+                    if sl is None: continue
+                    try: apply(sl, json.loads(ln))
+                    except Exception: pass
+            elif sl is not None and now - last > 4:
+                release(sl); sl = None
+        if sl is not None: release(sl)
+        try: ser.close()
+        except Exception: pass
 
 def apply(sl, d):
     t, k, pad = d['t'], d['k'], sl.pad
@@ -136,6 +185,25 @@ for i in range(8):
     rows.append((st, kb))
 tk.Label(right, text='Тип змінюється при наступному підключенні телефона', bg=BG, fg=DIM, font=('Segoe UI', 8)).grid(row=9, column=0, columnspan=4, sticky='w', pady=(8, 0))
 
+def refresh_ports():
+    bt_cb['values'] = [f'{p.device} — {p.description}' for p in lp.comports()] if lp else []
+def bt_show():
+    bt_lbl.config(text=('pyserial не знайдено' if not serial else ('Слухає: ' + ', '.join(sorted(BT)) if BT else 'COM-порти не додано')))
+def bt_add():
+    port = bt_var.get().split(' ')[0]
+    if not port or not serial or port in BT: return
+    BT.add(port); cfg['bt'] = sorted(BT); save(); bt_show()
+    threading.Thread(target=bt_reader, args=(port,), daemon=True).start()
+def bt_clear():
+    BT.clear(); cfg['bt'] = []; save(); bt_show()
+tk.Label(right, text='Bluetooth (вхідний COM-порт)', bg=BG, fg=FG, font=('Segoe UI', 11, 'bold')).grid(row=10, column=0, columnspan=4, sticky='w', pady=(14, 4))
+bt_var = tk.StringVar()
+bt_cb = ttk.Combobox(right, textvariable=bt_var, state='readonly', width=44, postcommand=refresh_ports); bt_cb.grid(row=11, column=0, columnspan=3, sticky='w')
+tk.Button(right, text='Слухати', command=bt_add, bg=BG, fg=FG, relief='solid', bd=1).grid(row=11, column=3)
+bt_lbl = tk.Label(right, bg=BG, fg=DIM, font=('Segoe UI', 9)); bt_lbl.grid(row=12, column=0, columnspan=3, sticky='w', pady=(4, 0))
+tk.Button(right, text='Скинути', command=bt_clear, bg=BG, fg=FG, relief='solid', bd=1).grid(row=12, column=3, pady=(4, 0))
+bt_show()
+
 def refresh():
     for sl, (st, kb) in zip(slots, rows):
         on = sl.pad is not None
@@ -145,5 +213,7 @@ def refresh():
         messagebox.showerror('Phone Gamepad', ERR.pop(0))
     root.after(500, refresh)
 
+for _p in list(BT):
+    if serial: threading.Thread(target=bt_reader, args=(_p,), daemon=True).start()
 threading.Thread(target=run_server, daemon=True).start()
 draw(); refresh(); root.mainloop()
