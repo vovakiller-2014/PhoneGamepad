@@ -57,6 +57,13 @@ class MainActivity : Activity() {
             } catch (_: Exception) {}
         }
 
+        @JavascriptInterface fun rumble(a: Int) {
+            try {
+                val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                if (a <= 0) v.cancel() else v.vibrate(VibrationEffect.createOneShot(1000, a.coerceIn(1, 255)))
+            } catch (_: Exception) {}
+        }
+
         @JavascriptInterface fun orient(land: Boolean) = runOnUiThread {
             requestedOrientation = if (land) ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             else ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR

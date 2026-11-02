@@ -45,23 +45,31 @@ h1{font-size:22px;margin:0;font-weight:600}h2{font-size:14px;color:#888;font-wei
 .mb{background:#0d0d0d;border:1px solid #333;border-radius:16px;padding:16px;width:min(92vw,380px);max-height:90vh;overflow:auto;touch-action:pan-y}
 .tabs{display:flex;gap:6px;margin-bottom:12px;align-items:center}.mb input{display:block;width:100%;margin-bottom:8px;padding:10px}
 .mb .pb{margin:0 6px 8px 0}.mb p{color:#999;font-size:14px}#ms{color:#f66;font-size:13px;margin-top:6px}.big{display:block;width:100%;text-align:left;padding:14px 16px;margin:0 0 8px!important;font-size:16px}
+.gp{position:absolute;transform:translate(-50%,-50%);pointer-events:none;color:var(--pc);background:rgba(0,0,0,.86);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent);border-radius:18px;z-index:5;opacity:0;transition:opacity .12s}
+.gp.show{opacity:1}.gp.prev{opacity:.6;border-style:dashed}.gp svg{width:100%;height:100%;display:block}
+.km{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.km label{display:flex;flex-direction:column;align-items:center;width:50px;font-size:11px;color:#aaa;gap:2px}.km .h{width:100%;font-size:10px;color:#777}
 </style></head><body>
 <div id="home"></div><div id="pl" hidden></div><div id="eb" hidden></div><div id="ep" hidden></div><div id="cm" hidden></div>
 <script>
 const A=window.Android||null,$=s=>document.querySelector(s),U=()=>Math.random().toString(36).slice(2,8),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const L={ua:{conn:'Підключення',lay:'Розкладки',cust:'Власні розкладки',nw:'Нова розкладка',pick:'Яка основа?',empty:'Порожня',save:'Зберегти',del:'Видалити',rst:'Скинути',lbl:'Текст',key:'Кнопка',ax:'Вісь',go:'Підключитись',scan:'Сканувати QR',noperm:'Потрібен дозвіл Bluetooth. Дозволь і натисни ↻',btoff:'Увімкни Bluetooth і натисни ↻',nodev:'Немає спарених пристроїв. Спаруй ПК у налаштуваннях телефона',btn:'Кнопка',stick:'Стік',wheel:'Кермо',tilt:'Нахил',slider:'Повзунок',xbox:'Xbox',ps:'PlayStation',rw:'Гонки: кермо',rt:'Гонки: нахил',fail:'Не вдалося підключитись',w:'Розмір',c:'Колір',rgb:'RGB рамка',rgbs:'Швидкість RGB',mx:'Кут керма °',sn:'Чутливість',dz:'Мертва зона %',cv:'Крива',sm:'Згладжування',ar:'Повернення в центр',rs:'Швидкість поверн.',tx:'Вигляд',inv:'Інвертувати',or:'Вертикально',rng:'Кут нахилу °',t0:'Кільце',t1:'Класичне',t2:'Болід',p0:'Дрифт',p1:'Звичайне',p2:'Точне',bkp:'Резервна копія',share:'Поділитись',imp:'Імпортувати'},
-en:{conn:'Connect',lay:'Layouts',cust:'Custom layouts',nw:'New layout',pick:'Start from?',empty:'Empty',save:'Save',del:'Delete',rst:'Reset',lbl:'Text',key:'Key',ax:'Axis',go:'Connect',scan:'Scan QR',noperm:'Bluetooth permission needed. Allow it and tap ↻',btoff:'Turn Bluetooth on and tap ↻',nodev:'No paired devices. Pair your PC in phone settings',btn:'Button',stick:'Stick',wheel:'Wheel',tilt:'Tilt',slider:'Slider',xbox:'Xbox',ps:'PlayStation',rw:'Racing: wheel',rt:'Racing: tilt',fail:'Connection failed',w:'Size',c:'Color',rgb:'RGB border',rgbs:'RGB speed',mx:'Lock angle °',sn:'Sensitivity',dz:'Deadzone %',cv:'Curve',sm:'Smoothing',ar:'Auto-center',rs:'Return speed',tx:'Style',inv:'Invert',or:'Vertical',rng:'Tilt range °',t0:'Ring',t1:'Classic',t2:'F1',p0:'Drift',p1:'Normal',p2:'Precise',bkp:'Backup',share:'Share',imp:'Import'}};
-const S={lang:'ua',hap:true,cur:'ps',profs:null,ip:'',pin:'',v:0};
+const L={ua:{hshift:'H-коробка',auto:'Автомат',h0:'Класична 1-6 R',h1:'5 + R',h2:'R зліва',a0:'Вертикальна',a1:'Горизонтальна',gt:'Вигляд',gs:'Розмір вікна',gc:'Колір вікна',gp:'Де з\'являється',gm:'Режим клавіші',near:'Біля кнопки',ctr:'По центру',pulse:'Натиск',holdk:'Утримання',keys:'Клавіші',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth ще не допрацьований',btwB:'Режим експериментальний і може розривати зʼєднання. Спаруй телефон із ПК у налаштуваннях Windows, створи вхідний COM-порт (Інші параметри Bluetooth → COM-порти → Додати → Вхідний) і запусти прослуховування в програмі на ПК. Рекомендується Wi-Fi. Натисни OK, щоб продовжити.',conn:'Підключення',lay:'Розкладки',cust:'Власні розкладки',nw:'Нова розкладка',pick:'Яка основа?',empty:'Порожня',save:'Зберегти',del:'Видалити',rst:'Скинути',lbl:'Текст',key:'Кнопка',ax:'Вісь',go:'Підключитись',scan:'Сканувати QR',noperm:'Потрібен дозвіл Bluetooth. Дозволь і натисни ↻',btoff:'Увімкни Bluetooth і натисни ↻',nodev:'Немає спарених пристроїв. Спаруй ПК у налаштуваннях телефона',btn:'Кнопка',stick:'Стік',wheel:'Кермо',tilt:'Нахил',slider:'Повзунок',xbox:'Xbox',ps:'PlayStation',rw:'Гонки: кермо',rt:'Гонки: нахил',fail:'Не вдалося підключитись',w:'Розмір',c:'Колір',rgb:'RGB рамка',rgbs:'Швидкість RGB',mx:'Кут керма °',sn:'Чутливість',dz:'Мертва зона %',cv:'Крива',sm:'Згладжування',ar:'Повернення в центр',rs:'Швидкість поверн.',tx:'Вигляд',inv:'Інвертувати',or:'Вертикально',rng:'Кут нахилу °',t0:'Кільце',t1:'Класичне',t2:'Болід',p0:'Дрифт',p1:'Звичайне',p2:'Точне',bkp:'Резервна копія',share:'Поділитись',imp:'Імпортувати'},
+en:{hshift:'H shifter',auto:'Automatic',h0:'Classic 1-6 R',h1:'5 + R',h2:'R left',a0:'Vertical',a1:'Horizontal',gt:'Style',gs:'Popup size',gc:'Popup color',gp:'Popup place',gm:'Key mode',near:'Near button',ctr:'Screen center',pulse:'Tap',holdk:'Hold',keys:'Keys',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth is experimental',btwB:'This mode is unfinished and may disconnect. Pair the phone with the PC in Windows settings, create an incoming COM port (More Bluetooth settings → COM Ports → Add → Incoming) and start listening in the PC app. Wi-Fi is recommended. Press OK to continue.',conn:'Connect',lay:'Layouts',cust:'Custom layouts',nw:'New layout',pick:'Start from?',empty:'Empty',save:'Save',del:'Delete',rst:'Reset',lbl:'Text',key:'Key',ax:'Axis',go:'Connect',scan:'Scan QR',noperm:'Bluetooth permission needed. Allow it and tap ↻',btoff:'Turn Bluetooth on and tap ↻',nodev:'No paired devices. Pair your PC in phone settings',btn:'Button',stick:'Stick',wheel:'Wheel',tilt:'Tilt',slider:'Slider',xbox:'Xbox',ps:'PlayStation',rw:'Racing: wheel',rt:'Racing: tilt',fail:'Connection failed',w:'Size',c:'Color',rgb:'RGB border',rgbs:'RGB speed',mx:'Lock angle °',sn:'Sensitivity',dz:'Deadzone %',cv:'Curve',sm:'Smoothing',ar:'Auto-center',rs:'Return speed',tx:'Style',inv:'Invert',or:'Vertical',rng:'Tilt range °',t0:'Ring',t1:'Classic',t2:'F1',p0:'Drift',p1:'Normal',p2:'Precise',bkp:'Backup',share:'Share',imp:'Import'}};
+const S={lang:'en',hap:true,cur:'ps',profs:null,ip:'',pin:'',v:0};
 try{Object.assign(S,JSON.parse(localStorage.gp2))}catch(e){}
 const t=k=>L[S.lang][k]||k,save=()=>{try{localStorage.gp2=JSON.stringify(S)}catch(e){}};
 const XB='LT:8:22:13 LB:8:34:13 RT:92:22:13 RB:92:34:13 L:17:68:30 R:62:78:26 UP:38:52:9 DOWN:38:82:9 LEFT:31:67:9 RIGHT:45:67:9 BACK:42:30:8 START:58:30:8 Y:86:46:11 A:86:76:11 X:77:61:11 B:95:61:11';
 const PS='LT:8:9:13 LB:8:21:13 RT:92:9:13 RB:92:21:13 UP:14:34:9 DOWN:14:60:9 LEFT:6:47:9 RIGHT:22:47:9 L:36:74:26 R:64:74:26 BACK:42:20:8 START:58:20:8 Y:86:34:11 A:86:64:11 X:77:49:11 B:95:49:11';
 const AR={UP:'▲',DOWN:'▼',LEFT:'◀',RIGHT:'▶',BACK:'⧉',START:'☰'},SY={A:'✕',B:'○',X:'□',Y:'△'};
 const XC={A:'#2ecc71',B:'#e74c3c',X:'#3498db',Y:'#f1c40f'},PC={A:'#5b8def',B:'#e74c3c',X:'#e87bbd',Y:'#2ecc71'};
+const GEAR=e=>e.t=='hshift'||e.t=='auto';
+const HT=[{x:[14,38,62,86],t:['1','3','5','R'],b:['2','4','6','']},{x:[20,50,80],t:['1','3','5'],b:['2','4','R']},{x:[14,38,62,86],t:['R','1','3','5'],b:['','2','4','6']}];
+const AT=[[['P',28,14],['R',28,38],['N',28,62],['D',28,86],['+',75,60],['-',75,84]],[['P',14,50],['R',38,50],['N',62,50],['D',86,50]]];
+const KM0={H:{'1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','R':'r','N':''},A:{P:'p',R:'r',N:'n',D:'d','+':'e','-':'q'}};
+const GD=ty=>({gt:0,gs:46,gc:'#dddddd',gp:0,gm:0,km:JSON.parse(JSON.stringify(ty=='hshift'?KM0.H:KM0.A))});
 const DEFP={dz:0,cv:0,sm:0,sn:1,ar:1,rs:350,tx:0,rgb:0,rgbs:4,inv:0,or:0};
 const PRE=[{p1:140,sn:1.5,sm:15,cv:20,dz:2,ar:1,rs:700},{p1:120,sn:1.2,sm:35,cv:30,dz:3,ar:1,rs:350},{p1:180,sn:1,sm:55,cv:50,dz:4,ar:1,rs:250}];
-function norm1(e){for(const k in DEFP)if(e[k]==undefined)e[k]=DEFP[k];if(e.t=='tilt'&&e.p1<0){e.p1=-e.p1;e.inv=1}return e}
+function norm1(e){if(GEAR(e)&&!e.km)Object.assign(e,GD(e.t));for(const k in DEFP)if(e[k]==undefined)e[k]=DEFP[k];if(e.t=='tilt'&&e.p1<0){e.p1=-e.p1;e.inv=1}return e}
 const norm=p=>{p.els.forEach(norm1);return p};
 function lay(s,ps,mid){return s.split(' ').map(q=>{const[k,x,y,w]=q.split(':');let ty='btn',l=(ps&&SY[k])||AR[k]||k,c=(ps?PC:XC)[k]||'#dddddd',W=+w,o={};
  if(k=='L'){ty=mid;l='';if(mid=='wheel'){o=PRE[1];W=40}if(mid=='tilt'){o={p1:35,sm:25,dz:3,cv:20};W=20}}if(k=='R'){ty='stick';l=''}
@@ -71,12 +79,12 @@ if(!S.profs)S.profs=DEFS();
 if(S.v<3){S.profs=[...DEFS(),...S.profs.filter(p=>!p.nk)];S.v=3}
 S.profs.forEach(norm);
 const dn=p=>p.nk?t(p.nk):p.name;
-let view='home',RT={},ED=null,link={kind:'',send(){}},ws=null,hb=0,tab='wifi';
+let view='home',RT={},ED=null,link={kind:'',send(){}},ws=null,hb=0,tab='wifi',btOK=0;
 const send=o=>{try{link.send(o)}catch(e){}};
 const tiltOn=on=>{if(A)A.tilt(!!on)};
 function tgl(k){if(k=='lang')S.lang=S.lang=='ua'?'en':'ua';else S.hap=!S.hap;save();home()}
 function card(p){return`<div class="card ${p.id==S.cur?'sel':''}" onclick="play('${p.id}')"><div class=pv>${p.els.map(e=>{const z=Math.max(5,e.w*.8);return`<i style="left:${e.x}%;top:${e.y}%;width:${z}px;height:${z}px;border-color:${e.c}"></i>`}).join('')}</div><div class=nm><b>${esc(dn(p))}</b><span class=ed onclick="event.stopPropagation();edit('${p.id}')">✎</span></div></div>`}
-function home(){view='home';if(A)A.orient(false);tiltOn(0);$('#pl').hidden=$('#eb').hidden=$('#ep').hidden=true;const h=$('#home');h.hidden=false;
+function home(){for(const id in RT)if(RT[id].rel)RT[id].rel();view='home';if(A)A.orient(false);tiltOn(0);$('#pl').hidden=$('#eb').hidden=$('#ep').hidden=true;const h=$('#home');h.hidden=false;
  h.innerHTML=`<div class=top><h1>Gamepad</h1><div class=tb><button class=pb onclick="tgl('lang')">${S.lang.toUpperCase()}</button><button class="pb ${S.hap?'on':''}" onclick="tgl('hap')">📳</button><button class=pb onclick=bk()>💾</button><button class="pb ${link.kind?'on':''}" onclick=conn()>${link.kind?'● '+(link.kind=='bt'?'Bluetooth':'Wi-Fi'):t('conn')}</button></div></div><h2>${t('lay')}</h2><div class=grid>${S.profs.filter(p=>p.nk).map(card).join('')}</div><h2>${t('cust')}</h2><div class=grid>${S.profs.filter(p=>!p.nk).map(card).join('')}<div class="card add" onclick=newP()>＋ ${t('nw')}</div></div>`}
 function play(id){S.cur=id;save();view='play';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;$('#eb').hidden=$('#ep').hidden=true;render(S.profs.find(p=>p.id==id),false)}
 function render(p,ed){const pl=$('#pl');pl.innerHTML='';RT={};p.els.forEach(e=>pl.appendChild(mkEl(e,ed)));tiltOn(!ed&&p.els.some(e=>e.t=='tilt'));if(!ed)startTick()}
@@ -97,12 +105,12 @@ const WS=['<circle cx=50 cy=50 r=44 fill=none stroke=currentColor stroke-width=5
 '<path d="M24 20H76Q92 20 92 36V58Q92 82 74 86H62L58 76H42L38 86H26Q8 82 8 58V36Q8 20 24 20Z" fill=none stroke=currentColor stroke-width=5 /><rect x=34 y=32 width=32 height=20 rx=4 fill=none stroke=currentColor stroke-width=4 /><path d="M50 20V28" stroke=currentColor stroke-width=6 />'];
 function mkEl(e,ed){const d=document.createElement('div'),u=Math.min(innerWidth,innerHeight)/100,sh=e.t=='btn'&&SHK.includes(e.k);
  d.className='el '+(e.t=='btn'?(sh?'sh':'rd'):e.t=='slider'?'sl':'rd '+e.t);
- if(e.t=='btn')d.textContent=e.l;else if(e.t=='stick')d.innerHTML='<b class=kn></b>';
+ if(e.t=='btn')d.textContent=e.l;else if(GEAR(e))d.textContent=e.t=='hshift'?'H':'A';else if(e.t=='stick')d.innerHTML='<b class=kn></b>';
  else if(e.t=='wheel'||e.t=='tilt')d.innerHTML=`<svg class=wh viewBox="0 0 100 100">${WS[e.t=='wheel'?e.tx:0]}</svg>`;else if(e.t=='slider')d.innerHTML='<b class=sk></b>';
  const sz=()=>{let W=e.w*u,H=W*(sh?.6:1);if(e.t=='slider'){H=W*.34;if(e.or){const q=W;W=H;H=q}}
   d.style.cssText=`left:${e.x}%;top:${e.y}%;width:${W}px;height:${H}px;--c:${e.c};--rd:${e.rgbs}s;font-size:${W*.38}px`;
   d.classList.toggle('rgb',!!e.rgb);if(e.t=='slider'){const k=d.firstChild;k.style.width=k.style.height=Math.min(W,H)*.78+'px'}};
- sz();const R=RT[e.id]={d,sz};ed?editBind(e,d,R):playBind(e,d,R);return d}
+ sz();const R=RT[e.id]={d,sz};if(GEAR(e))mkPop(e,R);ed?editBind(e,d,R):playBind(e,d,R);return d}
 function playBind(e,d,R){
  if(e.t=='btn'){const tr=e.k=='LT'||e.k=='RT',m=v=>tr?{t:'tr',k:e.k,v}:{t:'b',k:e.k,v};
   d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');if(S.hap&&A)A.vibrate(12);send(m(1))};
@@ -126,24 +134,58 @@ function playBind(e,d,R){
    kn.style[v?'top':'left']=(50+R.pos*35)+'%';return v?[0,R.pos]:[R.pos,0]});
   const mv=ev=>{const r=d.getBoundingClientRect(),p=v?(ev.clientY-r.top)/r.height:(ev.clientX-r.left)/r.width;R.pos=cl((p*100-50)/35,-1,1)};
   d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);R.hold=1;mv(ev)};d.onpointermove=ev=>{if(R.hold)mv(ev)};d.onpointerup=d.onpointercancel=()=>{R.hold=0}}
+ else if(GEAR(e)){const H=e.t=='hshift',g=gdef(e),SL=g.s,cols=H?g.h.x:[],pop=R.pop;
+  R.gear=null;R.lx=R.vx=50;R.ly=R.vy=50;R.col=null;R.held=null;R.act=0;R.ox=R.oy=0;let fx=0,fy=0;
+  const key=l=>(e.km&&e.km[l])||'',lab=()=>{d.textContent=R.gear||(H?'H':'A')};lab();
+  const press=l=>{const k=key(l);if(!k)return;send({t:'k',k,v:1});if(e.gm)R.held=k;else setTimeout(()=>send({t:'k',k,v:0}),70)};
+  R.rel=()=>{if(R.held){send({t:'k',k:R.held,v:0});R.held=null}};
+  const setGear=l=>{if(l===R.gear)return;R.rel();R.gear=l;lab();R.txs.forEach(x=>{const on=x.dataset.g==l;x.setAttribute('opacity',on?1:.55);x.setAttribute('font-size',on?11:9)});
+   if(l){const p=SL.find(q=>q[0]==l);if(p){R.lx=p[1];R.ly=p[2]}}if(S.hap&&A)A.vibrate(l?30:15);press(l||'N')};
+  const near=x=>{let b=0;cols.forEach((c,i)=>{if(Math.abs(c-x)<Math.abs(cols[b]-x))b=i});return b};
+  const sy=(i,top)=>top?(g.h.t[i]?22:50):(g.h.b[i]?78:50);
+  const cons=(x,y)=>{
+   if(!H){x=cl(x,8,92);y=cl(y,8,92);let b=null,bd=1e9;SL.forEach(p=>{const q=Math.hypot(p[1]-x,p[2]-y);if(q<bd){bd=q;b=p}});if(bd<=11&&b[0]!=R.gear)setGear(b[0]);return[x,y]}
+   if(R.col==null){x=cl(x,cols[0],cols[cols.length-1]);if(Math.abs(y-50)<=9)return[x,cl(y,41,59)];R.col=near(x)}
+   const i=R.col,cx=cols[i],top=y<50,lim=sy(i,top);y=cl(y,Math.min(50,lim),Math.max(50,lim));
+   if(!R.gear&&Math.abs(y-50)<=6){R.col=null;return[cx,cl(y,41,59)]}
+   const off=Math.abs(y-50),s=top?g.h.t[i]:g.h.b[i];
+   if(!R.gear&&s&&off>=22)setGear(s);else if(R.gear&&off<=16)setGear(null);
+   return[cx,y]};
+  R.step=dt=>{let tx=R.lx,ty=R.ly;if(R.gear){const p=SL.find(q=>q[0]==R.gear);if(p){tx=p[1];ty=p[2]}}const a=1-Math.exp(-dt/.045);R.vx+=(tx-R.vx)*a;R.vy+=(ty-R.vy)*a;R.lv.setAttribute('cx',R.vx);R.lv.setAttribute('cy',R.vy)};
+  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');popPos(e,R);pop.classList.add('show');fx=ev.clientX;fy=ev.clientY;R.bx=R.lx;R.by=R.ly;R.ox=R.oy=0;R.act=1;if(S.hap&&A)A.vibrate(10)};
+  d.onpointermove=ev=>{if(!R.act)return;const k=100/pop.getBoundingClientRect().width,tx=R.bx+(ev.clientX-fx)*k+R.ox,ty=R.by+(ev.clientY-fy)*k+R.oy,[cx,cy]=cons(tx,ty);R.ox+=cx-tx;R.oy+=cy-ty;R.lx=cx;R.ly=cy};
+  d.onpointerup=d.onpointercancel=()=>{R.act=0;d.classList.remove('on');pop.classList.remove('show')}}
  else if(e.t=='tilt'){const wh=d.firstChild,rg=e.p1||35;R.base=null;R.tgt=0;
   R.step=axisCtl(e,R,()=>[R.tgt,0]);
   R.tl=a=>{if(R.base==null)R.base=a;const dl=((a-R.base+540)%360)-180;R.tgt=cl(dl/rg,-1,1)*(e.inv?-1:1);wh.style.transform=`rotate(${R.tgt*rg}deg)`};
   d.onpointerdown=()=>{R.base=null}}}
 window.onTilt=(ax,ay)=>{const a=Math.atan2(ay,ax)*180/Math.PI;for(const id in RT)if(RT[id].tl)RT[id].tl(a)};
+/* ---- gearbox popup ---- */
+function gdef(e){if(e.t=='hshift'){const h=HT[e.gt]||HT[0],s=[];h.x.forEach((x,i)=>{if(h.t[i])s.push([h.t[i],x,22]);if(h.b[i])s.push([h.b[i],x,78])});return{h,s}}return{s:AT[e.gt]||AT[0]}}
+function gsvg(e){const g=gdef(e),H=e.t=='hshift';let h='<svg viewBox="0 0 100 100"><g stroke=currentColor stroke-width=2.2 fill=none stroke-linecap=round>';
+ if(H){const xs=g.h.x;h+=`<path d="M${xs[0]} 50H${xs[xs.length-1]}"/>`;xs.forEach((x,i)=>{const a=g.h.t[i]?22:50,b=g.h.b[i]?78:50;if(a!=b)h+=`<path d="M${x} ${a}V${b}"/>`})}
+ else if(e.gt==1)h+='<path d="M14 50H86"/>';else h+='<path d="M28 14V86M75 60V84"/>';
+ h+='</g><g fill=currentColor font-size=9 font-weight=600 text-anchor=middle>';
+ g.s.forEach(([l,x,y])=>{let tx=x,ty=y+3;if(H)ty=y<50?y-8:y+13;else if(e.gt==1)ty=y-10;else tx=x==28?13:88;h+=`<text data-g="${l}" x=${tx} y=${ty} opacity=.55>${l=='-'?'−':l}</text>`});
+ return h+'</g><circle r=5.5 cx=50 cy=50 fill=currentColor /></svg>'}
+function popPos(e,R){const u=Math.min(innerWidth,innerHeight)/100,s=e.gs*u,cx=e.gp?innerWidth/2:cl(e.x/100*innerWidth,s/2,innerWidth-s/2),cy=e.gp?innerHeight/2:cl(e.y/100*innerHeight,s/2,innerHeight-s/2);R.pop.style.cssText=`left:${cx}px;top:${cy}px;width:${s}px;height:${s}px;--pc:${e.gc}`}
+function mkPop(e,R){const p=document.createElement('div');p.className='gp';p.innerHTML=gsvg(e);R.pop=p;R.lv=p.querySelector('circle');R.txs=[...p.querySelectorAll('text')];$('#pl').appendChild(p);popPos(e,R)}
+function prev(){for(const id in RT){const R=RT[id];if(R.pop)R.pop.classList.remove('show','prev')}const e=ED&&ED.sel;if(e&&GEAR(e)&&RT[e.id]){const R=RT[e.id];R.pop.remove();mkPop(e,R);R.pop.classList.add('show','prev')}}
+function kmHtml(e){if(!GEAR(e))return'';const labs=e.t=='hshift'?[...new Set(gdef(e).s.map(p=>p[0]).concat('N'))]:gdef(e).s.map(p=>p[0]);
+ return`<div class=km><div class=h>${t('keys')}: ${t('keyhint')}</div>${labs.map(l=>`<label><span>${l=='-'?'−':l}</span><input value="${esc(e.km[l]||'')}" oninput="ED.sel.km['${l}']=this.value"></label>`).join('')}</div>`}
 /* ---- editor ---- */
 const KEYS=['A','B','X','Y','LB','RB','LT','RT','BACK','START','LS','RS','UP','DOWN','LEFT','RIGHT'];
 function edit(id){const p=S.profs.find(x=>x.id==id);ED={id,p:JSON.parse(JSON.stringify(p)),sel:null,snap:0};view='edit';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;render(ED.p,true);bar()}
 function editBind(e,d,R){let sx=null,sy,ox,oy;const q=v=>ED.snap?Math.round(v/2)*2:v;
  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);const ch=ED.sel!==e;ED.sel=e;sx=ev.clientX;sy=ev.clientY;ox=e.x;oy=e.y;if(ch)bar()};
- d.onpointermove=ev=>{if(sx==null)return;e.x=q(cl(ox+(ev.clientX-sx)/innerWidth*100,0,100));e.y=q(cl(oy+(ev.clientY-sy)/innerHeight*100,0,100));R.sz()};
+ d.onpointermove=ev=>{if(sx==null)return;e.x=q(cl(ox+(ev.clientX-sx)/innerWidth*100,0,100));e.y=q(cl(oy+(ev.clientY-sy)/innerHeight*100,0,100));R.sz();if(R.pop)popPos(e,R)};
  d.onpointerup=d.onpointercancel=()=>{sx=null}}
 function flds(e){const f=[];
- f.push(e.t=='btn'?['txt','l','lbl']:['sel','k','ax',['L','R']]);if(e.t=='btn')f.push(['sel','k','key',KEYS]);
+ if(GEAR(e))f.push(['sel','gt','gt',e.t=='hshift'?[0,1,2]:[0,1],e.t=='hshift'?[t('h0'),t('h1'),t('h2')]:[t('a0'),t('a1')]],['rng','gs','gs',20,90,1],['col','gc','gc'],['sel','gp','gp',[0,1],[t('near'),t('ctr')]],['sel','gm','gm',[0,1],[t('pulse'),t('holdk')]]);else{f.push(e.t=='btn'?['txt','l','lbl']:['sel','k','ax',['L','R']]);if(e.t=='btn')f.push(['sel','k','key',KEYS])}
  if(e.t=='wheel')f.push(['sel','tx','tx',[0,1,2],[t('t0'),t('t1'),t('t2')]],['rng','p1','mx',40,360,5],['rng','sn','sn',.4,3,.1]);
  if(e.t=='tilt')f.push(['rng','p1','rng',10,90,1],['chk','inv','inv']);
  if(e.t=='slider')f.push(['chk','or','or']);
- if(e.t!='btn')f.push(['rng','sm','sm',0,100,1],['rng','cv','cv',0,100,1],['rng','dz','dz',0,30,1]);
+ if(e.t!='btn'&&!GEAR(e))f.push(['rng','sm','sm',0,100,1],['rng','cv','cv',0,100,1],['rng','dz','dz',0,30,1]);
  if(e.t=='wheel'||e.t=='slider')f.push(['chk','ar','ar'],['rng','rs','rs',50,1500,50]);
  f.push(['rng','w','w',5,70,1],['col','c','c'],['chk','rgb','rgb'],['rng','rgbs','rgbs',1,10,1]);return f}
 function ctl(e,[ty,k,l,a,b,s]){const v=e[k],n=t(l);
@@ -153,17 +195,17 @@ function ctl(e,[ty,k,l,a,b,s]){const v=e[k],n=t(l);
  if(ty=='col')return`<label class=pr2><span>${n}</span><input type=color value="${v}" oninput="upd('${k}',this.value)"></label>`;
  return`<label class=pr2><span>${n}</span><select onchange="upd('${k}',isNaN(this.value)?this.value:+this.value)">${a.map((x,i)=>`<option value="${x}" ${x==v?'selected':''}>${b?b[i]:x}</option>`).join('')}</select></label>`}
 function bar(){const b=$('#eb'),e=ED.sel,tp=e&&e.y<22;b.hidden=false;b.style.top=tp?'auto':'0';b.style.bottom=tp?'0':'auto';
- let h=`<input value="${esc(dn(ED.p))}" size=9 oninput="ED.p.name=this.value;delete ED.p.nk"><select id=at>${['btn','stick','wheel','tilt','slider'].map(x=>`<option value=${x}>${t(x)}</option>`).join('')}</select><button onclick=addE()>＋</button>`;
+ let h=`<input value="${esc(dn(ED.p))}" size=9 oninput="ED.p.name=this.value;delete ED.p.nk"><select id=at>${['btn','stick','wheel','tilt','slider','hshift','auto'].map(x=>`<option value=${x}>${t(x)}</option>`).join('')}</select><button onclick=addE()>＋</button>`;
  if(e)h+=`<button onclick=dupE()>⧉</button><button onclick=delE()>🗑</button>`;
  h+=`<button class="${ED.snap?'sv':''}" onclick=snapT()>▦</button><button class=sv onclick=saveE()>${t('save')}</button><button onclick=home()>✕</button>`+(ED.p.nk?`<button onclick=rstE()>${t('rst')}</button>`:`<button onclick=delP()>${t('del')}</button>`);b.innerHTML=h;
- const p=$('#ep');if(!e){p.hidden=true;return}p.hidden=false;p.style.top=tp?'8px':'54px';p.style.left=e.x<50?'auto':'8px';p.style.right=e.x<50?'8px':'auto';
- p.innerHTML=flds(e).map(f=>ctl(e,f)).join('')+(e.t=='wheel'?`<div class=pre>${[0,1,2].map(i=>`<button onclick=preset(${i})>${t('p'+i)}</button>`).join('')}</div>`:'');
- document.querySelectorAll('.el.sel').forEach(x=>x.classList.remove('sel'));RT[e.id].d.classList.add('sel')}
-function upd(f,v){const e=ED.sel;e[f]=v;if(f=='k'||f=='tx'||f=='or'){render(ED.p,true);bar()}else{const R=RT[e.id];if(f=='l')R.d.textContent=v;else R.sz()}}
+ const p=$('#ep');if(!e){p.hidden=true;prev();return}p.hidden=false;p.style.top=tp?'8px':'54px';p.style.left=e.x<50?'auto':'8px';p.style.right=e.x<50?'8px':'auto';
+ p.innerHTML=flds(e).map(f=>ctl(e,f)).join('')+(e.t=='wheel'?`<div class=pre>${[0,1,2].map(i=>`<button onclick=preset(${i})>${t('p'+i)}</button>`).join('')}</div>`:'')+kmHtml(e);
+ document.querySelectorAll('.el.sel').forEach(x=>x.classList.remove('sel'));RT[e.id].d.classList.add('sel');prev()}
+function upd(f,v){const e=ED.sel;e[f]=v;if(f=='k'||f=='tx'||f=='or'){render(ED.p,true);bar()}else if(f=='gt'){bar()}else{const R=RT[e.id];if(f=='l')R.d.textContent=v;else R.sz();if(GEAR(e))prev()}}
 function preset(i){Object.assign(ED.sel,PRE[i]);bar()}
 function snapT(){ED.snap=ED.snap?0:1;bar()}
-function newEl(ty){const e={id:U(),t:ty,k:ty=='btn'?'A':'L',l:ty=='btn'?'●':'',x:50,y:50,w:{btn:11,stick:26,wheel:36,tilt:20,slider:40}[ty],c:'#dddddd',p1:0};
- if(ty=='wheel')Object.assign(e,PRE[1]);if(ty=='tilt')Object.assign(e,{p1:35,sm:25,dz:3,cv:20});if(ty=='slider')Object.assign(e,{sm:20});return norm1(e)}
+function newEl(ty){const e={id:U(),t:ty,k:ty=='btn'?'A':'L',l:ty=='btn'?'●':'',x:50,y:50,w:{btn:11,stick:26,wheel:36,tilt:20,slider:40,hshift:11,auto:11}[ty],c:'#dddddd',p1:0};
+ if(ty=='wheel')Object.assign(e,PRE[1]);if(ty=='tilt')Object.assign(e,{p1:35,sm:25,dz:3,cv:20});if(ty=='slider')Object.assign(e,{sm:20});if(ty=='hshift'||ty=='auto')Object.assign(e,GD(ty));return norm1(e)}
 function addE(){const e=newEl($('#at').value);ED.p.els.push(e);ED.sel=e;render(ED.p,true);bar()}
 function dupE(){const c=JSON.parse(JSON.stringify(ED.sel));c.id=U();c.x=cl(c.x+4,0,100);c.y=cl(c.y+4,0,100);ED.p.els.push(c);ED.sel=c;render(ED.p,true);bar()}
 function delE(){ED.p.els=ED.p.els.filter(x=>x!=ED.sel);ED.sel=null;render(ED.p,true);bar()}
@@ -181,14 +223,14 @@ function conn(){if(link.kind){closeLink();home();return}cm(1)}
 function cm(on){const m=$('#cm');m.hidden=!on;if(!on)return;
  m.innerHTML=`<div class=mb><div class=tabs><button class="pb ${tab=='wifi'?'on':''}" onclick="tab='wifi';cm(1)">Wi-Fi</button><button class="pb ${tab=='bt'?'on':''}" onclick="tab='bt';cm(1)">Bluetooth</button><button class=pb onclick=cm(0)>✕</button></div><div id=mc></div><div id=ms></div></div>`;
  if(tab=='wifi')$('#mc').innerHTML=`<input id=ip placeholder="IP" value="${esc(S.ip)}"><input id=pn placeholder=PIN inputmode=numeric value="${esc(S.pin)}"><button class="pb on" onclick=goW()>${t('go')}</button>${A?`<button class=pb onclick=A.scanQr()>${t('scan')}</button>`:''}`;
- else btList()}
+ else if(!btOK)$('#mc').innerHTML=`<p><b>${t('btwT')}</b></p><p>${t('btwB')}</p><button class="pb on" onclick="btOK=1;cm(1)">OK</button>`;else btList()}
 function btList(){const r=A?A.btDevices():'[]',s=$('#mc'),rf=`<button class=pb onclick=cm(1)>↻</button>`;
  if(r=='NOPERM')return s.innerHTML=`<p>${t('noperm')}</p>${rf}`;if(r=='OFF')return s.innerHTML=`<p>${t('btoff')}</p>${rf}`;
  const d=JSON.parse(r);s.innerHTML=d.length?d.map(x=>`<button class=pb onclick="btc('${x.a}')">${esc(x.n)}</button>`).join(''):`<p>${t('nodev')}</p>${rf}`}
 function btc(a){closeLink();A.btConnect(a);msg('…')}
 function goW(){S.ip=$('#ip').value.trim();S.pin=$('#pn').value.trim();save();wifi(S.ip,S.pin)}
 function wifi(host,pin){closeLink();const t0=Date.now();let w;try{w=ws=new WebSocket(`ws://${host.includes(':')?host:host+':8080'}/ws?pin=${pin}`)}catch(e){return msg(t('fail'))}
- w.onopen=()=>{link={kind:'wifi',send:o=>w.readyState==1&&w.send(JSON.stringify(o))};cm(0);if(view=='home')home()};
+ w.onmessage=m=>{try{const d=JSON.parse(m.data);if(d.t=='rb'&&S.hap&&A)A.rumble(Math.max(d.l,d.s))}catch(x){}};w.onopen=()=>{link={kind:'wifi',send:o=>w.readyState==1&&w.send(JSON.stringify(o))};cm(0);if(view=='home')home()};
  w.onclose=()=>{if(ws!==w)return;const was=link.kind=='wifi';link={kind:'',send(){}};ws=null;if(was&&Date.now()-t0<1500)cm(1);msg(t('fail'));if(view=='home')home()}}
 window.onLink=k=>{clearInterval(hb);if(k=='bt'){link={kind:'bt',send:o=>A.btSend(JSON.stringify(o))};hb=setInterval(()=>send({t:'hb',k:''}),1000);cm(0)}else{link={kind:'',send(){}};if(!$('#cm').hidden)msg(t('fail'))}if(view=='home')home()};
 window.onQr=u=>{try{const x=new URL(u);S.ip=x.host;S.pin=x.searchParams.get('pin')||'';save();tab='wifi';cm(1);wifi(S.ip,S.pin)}catch(e){msg(t('fail'))}};
