@@ -26,6 +26,7 @@ TX = {
  'listen': ('Listen', 'Слухати'), 'reset': ('Reset', 'Скинути'),
  'nobt': ('No COM ports added', 'COM-порти не додано'), 'lis': ('Listening: ', 'Слухає: '),
  'nopy': ('pyserial not found', 'pyserial не знайдено'), 'newpin': ('New PIN', 'Новий PIN'),
+ 'tv': ('Test vibration', 'Тест вібрації'),
  'addr': ('Refresh address', 'Оновити адресу'),
  'btt': ('Bluetooth is experimental', 'Bluetooth ще не допрацьований'),
  'btb': ('This mode is unfinished and may disconnect.\n\n1. Pair the phone with this PC in Windows Settings > Bluetooth.\n2. Create an incoming COM port: More Bluetooth settings > COM Ports > Add > Incoming.\n3. Select that port here and press Listen, then connect from the phone app (Connect > Bluetooth).\n\nWi-Fi is the recommended way. Continue?',
@@ -242,7 +243,14 @@ def new_pin():
     cfg['pin'] = str(random.randint(100000, 999999)); save(); draw()
 
 mkbtn(left, 'addr', draw, padx=10).pack(pady=(8, 0), fill='x')
+def test_rumble():
+    def go(l, s):
+        for sl in slots:
+            if sl.ws and LOOP:
+                asyncio.run_coroutine_threadsafe(sl.ws.send_str(json.dumps({'t': 'rb', 'l': l, 's': s})), LOOP[0])
+    go(200, 200); root.after(600, lambda: go(0, 0))
 mkbtn(left, 'newpin', new_pin, padx=10).pack(pady=(6, 0), fill='x')
+mkbtn(left, 'tv', test_rumble, padx=10).pack(pady=(6, 0), fill='x')
 lang_btn = tk.Button(left, bg=BG, fg=FG, relief='solid', bd=1, padx=10, activebackground='#222', activeforeground=FG)
 lang_btn.pack(pady=(6, 0), fill='x')
 
