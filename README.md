@@ -13,6 +13,18 @@ Turn your **Android phone into a gamepad for your PC**. Games see a real virtual
 
 All versions and release notes: [Releases page](https://github.com/vovakiller-2014/PhoneGamepad/releases).
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/home.jpg" width="260" alt="Layouts screen">
+</p>
+
+| Xbox layout | PlayStation layout |
+|:---:|:---:|
+| <img src="screenshots/xbox.jpg" width="420" alt="Xbox layout"> | <img src="screenshots/playstation.jpg" width="420" alt="PlayStation layout"> |
+| **Custom layout** (slider, H-shifter button, RGB borders) | **Editor** (steering wheel settings) |
+| <img src="screenshots/custom.jpg" width="420" alt="Custom layout"> | <img src="screenshots/editor.jpg" width="420" alt="Layout editor"> |
+
 ## ✨ Features
 
 **Controller**
