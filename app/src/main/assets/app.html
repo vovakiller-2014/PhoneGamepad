@@ -48,16 +48,17 @@ h1{font-size:22px;margin:0;font-weight:600}h2{font-size:14px;color:#888;font-wei
 .gp{position:absolute;transform:translate(-50%,-50%);pointer-events:none;color:var(--pc);background:rgba(0,0,0,.86);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent);border-radius:18px;z-index:5;opacity:0;transition:opacity .12s}
 .gp.show{opacity:1}.gp.prev{opacity:.6;border-style:dashed}.gp svg{width:100%;height:100%;display:block}
 .km{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.km label{display:flex;flex-direction:column;align-items:center;width:50px;font-size:11px;color:#aaa;gap:2px}.km .h{width:100%;font-size:10px;color:#777}
+.bgi{position:absolute;inset:0;pointer-events:none}.ts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;border-radius:10px;padding:10px 16px;z-index:50;font-size:13px}.mb input[type=color]{height:36px;padding:0}.mb select{width:100%;padding:8px}
 </style></head><body>
 <div id="home"></div><div id="pl" hidden></div><div id="eb" hidden></div><div id="ep" hidden></div><div id="cm" hidden></div>
 <script>
 const A=window.Android||null,$=s=>document.querySelector(s),U=()=>Math.random().toString(36).slice(2,8),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const L={ua:{hshift:'H-коробка',auto:'Автомат',h0:'Класична 1-6 R',h1:'5 + R',h2:'R зліва',a0:'Вертикальна',a1:'Горизонтальна',gt:'Вигляд',gs:'Розмір вікна',gc:'Колір вікна',gp:'Де з\'являється',gm:'Режим клавіші',near:'Біля кнопки',ctr:'По центру',pulse:'Натиск',holdk:'Утримання',keys:'Клавіші',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth ще не допрацьований',btwB:'Режим експериментальний і може розривати зʼєднання. Спаруй телефон із ПК у налаштуваннях Windows, створи вхідний COM-порт (Інші параметри Bluetooth → COM-порти → Додати → Вхідний) і запусти прослуховування в програмі на ПК. Рекомендується Wi-Fi. Натисни OK, щоб продовжити.',conn:'Підключення',lay:'Розкладки',cust:'Власні розкладки',nw:'Нова розкладка',pick:'Яка основа?',empty:'Порожня',save:'Зберегти',del:'Видалити',rst:'Скинути',lbl:'Текст',key:'Кнопка',ax:'Вісь',go:'Підключитись',scan:'Сканувати QR',noperm:'Потрібен дозвіл Bluetooth. Дозволь і натисни ↻',btoff:'Увімкни Bluetooth і натисни ↻',nodev:'Немає спарених пристроїв. Спаруй ПК у налаштуваннях телефона',btn:'Кнопка',stick:'Стік',wheel:'Кермо',tilt:'Нахил',slider:'Повзунок',xbox:'Xbox',ps:'PlayStation',rw:'Гонки: кермо',rt:'Гонки: нахил',fail:'Не вдалося підключитись',w:'Розмір',c:'Колір',rgb:'RGB рамка',rgbs:'Швидкість RGB',mx:'Кут керма °',sn:'Чутливість',dz:'Мертва зона %',cv:'Крива',sm:'Згладжування',ar:'Повернення в центр',rs:'Швидкість поверн.',tx:'Вигляд',inv:'Інвертувати',or:'Вертикально',rng:'Кут нахилу °',t0:'Кільце',t1:'Класичне',t2:'Болід',p0:'Дрифт',p1:'Звичайне',p2:'Точне',bkp:'Резервна копія',share:'Поділитись',imp:'Імпортувати'},
-en:{hshift:'H shifter',auto:'Automatic',h0:'Classic 1-6 R',h1:'5 + R',h2:'R left',a0:'Vertical',a1:'Horizontal',gt:'Style',gs:'Popup size',gc:'Popup color',gp:'Popup place',gm:'Key mode',near:'Near button',ctr:'Screen center',pulse:'Tap',holdk:'Hold',keys:'Keys',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth is experimental',btwB:'This mode is unfinished and may disconnect. Pair the phone with the PC in Windows settings, create an incoming COM port (More Bluetooth settings → COM Ports → Add → Incoming) and start listening in the PC app. Wi-Fi is recommended. Press OK to continue.',conn:'Connect',lay:'Layouts',cust:'Custom layouts',nw:'New layout',pick:'Start from?',empty:'Empty',save:'Save',del:'Delete',rst:'Reset',lbl:'Text',key:'Key',ax:'Axis',go:'Connect',scan:'Scan QR',noperm:'Bluetooth permission needed. Allow it and tap ↻',btoff:'Turn Bluetooth on and tap ↻',nodev:'No paired devices. Pair your PC in phone settings',btn:'Button',stick:'Stick',wheel:'Wheel',tilt:'Tilt',slider:'Slider',xbox:'Xbox',ps:'PlayStation',rw:'Racing: wheel',rt:'Racing: tilt',fail:'Connection failed',w:'Size',c:'Color',rgb:'RGB border',rgbs:'RGB speed',mx:'Lock angle °',sn:'Sensitivity',dz:'Deadzone %',cv:'Curve',sm:'Smoothing',ar:'Auto-center',rs:'Return speed',tx:'Style',inv:'Invert',or:'Vertical',rng:'Tilt range °',t0:'Ring',t1:'Classic',t2:'F1',p0:'Drift',p1:'Normal',p2:'Precise',bkp:'Backup',share:'Share',imp:'Import'}};
+const L={ua:{bg:'Фон',bgf:'Розмір картинки',f_contain:'Вписати',f_cover:'Заповнити',f_fill:'Розтягнути',bgo:'Прозорість картинки',bgi:'Обрати картинку',bgr:'Прибрати картинку',bgz:'Чорний #000',big:'Картинка завелика, щоб зберегти',hshift:'H-коробка',auto:'Автомат',h0:'Класична 1-6 R',h1:'5 + R',h2:'R зліва',a0:'Вертикальна',a1:'Горизонтальна',gt:'Вигляд',gs:'Розмір вікна',gc:'Колір вікна',gp:'Де з\'являється',gm:'Режим клавіші',near:'Біля кнопки',ctr:'По центру',pulse:'Натиск (разовий)',holdk:'Утримання (передача тримається)',gg:'Чутливість',gf:'Проти тремтіння',gl:'Плавність важеля',gn:'Нейтральна зона',ge:'Глибина вмикання',gr:'Опір вибиванню',keys:'Клавіші',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth ще не допрацьований',btwB:'Режим експериментальний і може розривати зʼєднання. Спаруй телефон із ПК у налаштуваннях Windows, створи вхідний COM-порт (Інші параметри Bluetooth → COM-порти → Додати → Вхідний) і запусти прослуховування в програмі на ПК. Рекомендується Wi-Fi. Натисни OK, щоб продовжити.',conn:'Підключення',lay:'Розкладки',cust:'Власні розкладки',nw:'Нова розкладка',pick:'Яка основа?',empty:'Порожня',save:'Зберегти',del:'Видалити',rst:'Скинути',lbl:'Текст',key:'Кнопка',ax:'Вісь',go:'Підключитись',scan:'Сканувати QR',noperm:'Потрібен дозвіл Bluetooth. Дозволь і натисни ↻',btoff:'Увімкни Bluetooth і натисни ↻',nodev:'Немає спарених пристроїв. Спаруй ПК у налаштуваннях телефона',btn:'Кнопка',stick:'Стік',wheel:'Кермо',tilt:'Нахил',slider:'Повзунок',xbox:'Xbox',ps:'PlayStation',rw:'Гонки: кермо',rt:'Гонки: нахил',fail:'Не вдалося підключитись',w:'Розмір',c:'Колір',rgb:'RGB рамка',rgbs:'Швидкість RGB',mx:'Кут керма °',sn:'Чутливість',dz:'Мертва зона %',cv:'Крива',sm:'Згладжування',ar:'Повернення в центр',rs:'Швидкість поверн.',tx:'Вигляд',inv:'Інвертувати',or:'Вертикально',rng:'Кут нахилу °',t0:'Кільце',t1:'Класичне',t2:'Болід',p0:'Дрифт',p1:'Звичайне',p2:'Точне',bkp:'Резервна копія',share:'Поділитись',imp:'Імпортувати'},
+en:{bg:'Background',bgf:'Image fit',f_contain:'Fit',f_cover:'Fill',f_fill:'Stretch',bgo:'Image opacity',bgi:'Choose image',bgr:'Remove image',bgz:'Black #000',big:'Image too large to save',hshift:'H shifter',auto:'Automatic',h0:'Classic 1-6 R',h1:'5 + R',h2:'R left',a0:'Vertical',a1:'Horizontal',gt:'Style',gs:'Popup size',gc:'Popup color',gp:'Popup place',gm:'Key mode',near:'Near button',ctr:'Screen center',pulse:'Tap (momentary)',holdk:'Hold (gear stays)',gg:'Sensitivity',gf:'Anti-jitter',gl:'Lever smoothness',gn:'Neutral zone',ge:'Engage depth',gr:'Eject resistance',keys:'Keys',keyhint:'a-z, 0-9, up, down, left, right, space, enter, shift, ctrl, alt, f1-f12, num0-9',btwT:'Bluetooth is experimental',btwB:'This mode is unfinished and may disconnect. Pair the phone with the PC in Windows settings, create an incoming COM port (More Bluetooth settings → COM Ports → Add → Incoming) and start listening in the PC app. Wi-Fi is recommended. Press OK to continue.',conn:'Connect',lay:'Layouts',cust:'Custom layouts',nw:'New layout',pick:'Start from?',empty:'Empty',save:'Save',del:'Delete',rst:'Reset',lbl:'Text',key:'Key',ax:'Axis',go:'Connect',scan:'Scan QR',noperm:'Bluetooth permission needed. Allow it and tap ↻',btoff:'Turn Bluetooth on and tap ↻',nodev:'No paired devices. Pair your PC in phone settings',btn:'Button',stick:'Stick',wheel:'Wheel',tilt:'Tilt',slider:'Slider',xbox:'Xbox',ps:'PlayStation',rw:'Racing: wheel',rt:'Racing: tilt',fail:'Connection failed',w:'Size',c:'Color',rgb:'RGB border',rgbs:'RGB speed',mx:'Lock angle °',sn:'Sensitivity',dz:'Deadzone %',cv:'Curve',sm:'Smoothing',ar:'Auto-center',rs:'Return speed',tx:'Style',inv:'Invert',or:'Vertical',rng:'Tilt range °',t0:'Ring',t1:'Classic',t2:'F1',p0:'Drift',p1:'Normal',p2:'Precise',bkp:'Backup',share:'Share',imp:'Import'}};
 const S={lang:'en',hap:true,cur:'ps',profs:null,ip:'',pin:'',v:0};
 try{Object.assign(S,JSON.parse(localStorage.gp2))}catch(e){}
-const t=k=>L[S.lang][k]||k,save=()=>{try{localStorage.gp2=JSON.stringify(S)}catch(e){}};
+const t=k=>L[S.lang][k]||k,save=()=>{try{localStorage.gp2=JSON.stringify(S);return true}catch(e){return false}};
 const XB='LT:8:22:13 LB:8:34:13 RT:92:22:13 RB:92:34:13 L:17:68:30 R:62:78:26 UP:38:52:9 DOWN:38:82:9 LEFT:31:67:9 RIGHT:45:67:9 BACK:42:30:8 START:58:30:8 Y:86:46:11 A:86:76:11 X:77:61:11 B:95:61:11';
 const PS='LT:8:9:13 LB:8:21:13 RT:92:9:13 RB:92:21:13 UP:14:34:9 DOWN:14:60:9 LEFT:6:47:9 RIGHT:22:47:9 L:36:74:26 R:64:74:26 BACK:42:20:8 START:58:20:8 Y:86:34:11 A:86:64:11 X:77:49:11 B:95:49:11';
 const AR={UP:'▲',DOWN:'▼',LEFT:'◀',RIGHT:'▶',BACK:'⧉',START:'☰'},SY={A:'✕',B:'○',X:'□',Y:'△'};
@@ -66,28 +67,31 @@ const GEAR=e=>e.t=='hshift'||e.t=='auto';
 const HT=[{x:[14,38,62,86],t:['1','3','5','R'],b:['2','4','6','']},{x:[20,50,80],t:['1','3','5'],b:['2','4','R']},{x:[14,38,62,86],t:['R','1','3','5'],b:['','2','4','6']}];
 const AT=[[['P',28,14],['R',28,38],['N',28,62],['D',28,86],['+',75,60],['-',75,84]],[['P',14,50],['R',38,50],['N',62,50],['D',86,50]]];
 const KM0={H:{'1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','R':'r','N':''},A:{P:'p',R:'r',N:'n',D:'d','+':'e','-':'q'}};
-const GD=ty=>({gt:0,gs:46,gc:'#dddddd',gp:0,gm:0,km:JSON.parse(JSON.stringify(ty=='hshift'?KM0.H:KM0.A))});
+const GD=ty=>({gt:0,gs:46,gc:'#dddddd',gp:0,gm:1,gg:1,gf:25,gl:40,gn:12,ge:21,gr:5,km:JSON.parse(JSON.stringify(ty=='hshift'?KM0.H:KM0.A))});
 const DEFP={dz:0,cv:0,sm:0,sn:1,ar:1,rs:350,tx:0,rgb:0,rgbs:4,inv:0,or:0};
 const PRE=[{p1:140,sn:1.5,sm:15,cv:20,dz:2,ar:1,rs:700},{p1:120,sn:1.2,sm:35,cv:30,dz:3,ar:1,rs:350},{p1:180,sn:1,sm:55,cv:50,dz:4,ar:1,rs:250}];
-function norm1(e){if(GEAR(e)&&!e.km)Object.assign(e,GD(e.t));for(const k in DEFP)if(e[k]==undefined)e[k]=DEFP[k];if(e.t=='tilt'&&e.p1<0){e.p1=-e.p1;e.inv=1}return e}
-const norm=p=>{p.els.forEach(norm1);return p};
+function norm1(e){if(GEAR(e)){const q=GD(e.t);for(const k in q)if(e[k]==undefined)e[k]=q[k]}for(const k in DEFP)if(e[k]==undefined)e[k]=DEFP[k];if(e.t=='tilt'&&e.p1<0){e.p1=-e.p1;e.inv=1}return e}
+const BG0={c:'#000000',img:'',fit:'contain',op:100};
+const norm=p=>{p.els.forEach(norm1);p.bg=Object.assign({},BG0,p.bg||{});return p};
 function lay(s,ps,mid){return s.split(' ').map(q=>{const[k,x,y,w]=q.split(':');let ty='btn',l=(ps&&SY[k])||AR[k]||k,c=(ps?PC:XC)[k]||'#dddddd',W=+w,o={};
- if(k=='L'){ty=mid;l='';if(mid=='wheel'){o=PRE[1];W=40}if(mid=='tilt'){o={p1:35,sm:25,dz:3,cv:20};W=20}}if(k=='R'){ty='stick';l=''}
+ if(k=='L'){ty=mid;l='';if(mid=='wheel'){o=PRE[1];W=40}if(mid=='tilt'){o={p1:35,sm:12,dz:2,cv:15};W=20}}if(k=='R'){ty='stick';l=''}
  return norm1(Object.assign({id:U(),t:ty,k,l,x:+x,y:+y,w:W,c,p1:0},o))})}
 const DEFS=()=>[{id:'xbox',nk:'xbox',els:lay(XB,0,'stick')},{id:'ps',nk:'ps',els:lay(PS,1,'stick')},{id:'rw',nk:'rw',els:lay(PS,1,'wheel')},{id:'rt',nk:'rt',els:lay(PS,1,'tilt')}];
 if(!S.profs)S.profs=DEFS();
 if(S.v<3){S.profs=[...DEFS(),...S.profs.filter(p=>!p.nk)];S.v=3}
-S.profs.forEach(norm);
+S.profs.forEach(norm);if(S.v<5){S.profs.forEach(p=>p.els.forEach(e=>{if(GEAR(e))e.gm=1}));S.v=5;save()}
+if(S.v<6){S.profs.forEach(p=>p.els.forEach(e=>{if(e.t=='tilt'){e.sm=12;e.dz=2;e.cv=15}}));S.v=6;save()}
 const dn=p=>p.nk?t(p.nk):p.name;
 let view='home',RT={},ED=null,link={kind:'',send(){}},ws=null,hb=0,tab='wifi',btOK=0;
 const send=o=>{try{link.send(o)}catch(e){}};
 const tiltOn=on=>{if(A)A.tilt(!!on)};
 function tgl(k){if(k=='lang')S.lang=S.lang=='ua'?'en':'ua';else S.hap=!S.hap;save();home()}
-function card(p){return`<div class="card ${p.id==S.cur?'sel':''}" onclick="play('${p.id}')"><div class=pv>${p.els.map(e=>{const z=Math.max(5,e.w*.8);return`<i style="left:${e.x}%;top:${e.y}%;width:${z}px;height:${z}px;border-color:${e.c}"></i>`}).join('')}</div><div class=nm><b>${esc(dn(p))}</b><span class=ed onclick="event.stopPropagation();edit('${p.id}')">✎</span></div></div>`}
+function card(p){return`<div class="card ${p.id==S.cur?'sel':''}" onclick="play('${p.id}')"><div class=pv style="background:${esc((p.bg&&p.bg.c)||'#000000')}">${p.els.map(e=>{const z=Math.max(5,e.w*.8);return`<i style="left:${e.x}%;top:${e.y}%;width:${z}px;height:${z}px;border-color:${e.c}"></i>`}).join('')}</div><div class=nm><b>${esc(dn(p))}</b><span class=ed onclick="event.stopPropagation();edit('${p.id}')">✎</span></div></div>`}
 function home(){for(const id in RT)if(RT[id].rel)RT[id].rel();view='home';if(A)A.orient(false);tiltOn(0);$('#pl').hidden=$('#eb').hidden=$('#ep').hidden=true;const h=$('#home');h.hidden=false;
  h.innerHTML=`<div class=top><h1>Gamepad</h1><div class=tb><button class=pb onclick="tgl('lang')">${S.lang.toUpperCase()}</button><button class="pb ${S.hap?'on':''}" onclick="tgl('hap')">📳</button><button class=pb onclick=bk()>💾</button><button class="pb ${link.kind?'on':''}" onclick=conn()>${link.kind?'● '+(link.kind=='bt'?'Bluetooth':'Wi-Fi'):t('conn')}</button></div></div><h2>${t('lay')}</h2><div class=grid>${S.profs.filter(p=>p.nk).map(card).join('')}</div><h2>${t('cust')}</h2><div class=grid>${S.profs.filter(p=>!p.nk).map(card).join('')}<div class="card add" onclick=newP()>＋ ${t('nw')}</div></div>`}
 function play(id){S.cur=id;save();view='play';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;$('#eb').hidden=$('#ep').hidden=true;render(S.profs.find(p=>p.id==id),false)}
-function render(p,ed){const pl=$('#pl');pl.innerHTML='';RT={};p.els.forEach(e=>pl.appendChild(mkEl(e,ed)));tiltOn(!ed&&p.els.some(e=>e.t=='tilt'));if(!ed)startTick()}
+function applyBg(p){const pl=$('#pl'),b=p.bg||BG0;pl.style.backgroundColor=b.c;let l=pl.querySelector('.bgi');if(!l){l=document.createElement('div');l.className='bgi';pl.prepend(l)}l.style.cssText=b.img?`background:url("${b.img}") center/${b.fit=='fill'?'100% 100%':b.fit} no-repeat;opacity:${b.op/100}`:'display:none'}
+function render(p,ed){const pl=$('#pl');pl.innerHTML='';applyBg(p);RT={};p.els.forEach(e=>pl.appendChild(mkEl(e,ed)));tiltOn(!ed&&p.els.some(e=>e.t=='tilt'));if(!ed)startTick()}
 /* ---- axis filter + ticker ---- */
 const shape=(v,e)=>{const s=Math.sign(v),z=e.dz/100;let a=Math.abs(v);a=a<z?0:(a-z)/(1-z);return s*Math.pow(a,1+e.cv/50)};
 function axisCtl(e,R,get){R.cx=R.cy=0;R.sx=R.sy=null;
@@ -135,31 +139,33 @@ function playBind(e,d,R){
   const mv=ev=>{const r=d.getBoundingClientRect(),p=v?(ev.clientY-r.top)/r.height:(ev.clientX-r.left)/r.width;R.pos=cl((p*100-50)/35,-1,1)};
   d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);R.hold=1;mv(ev)};d.onpointermove=ev=>{if(R.hold)mv(ev)};d.onpointerup=d.onpointercancel=()=>{R.hold=0}}
  else if(GEAR(e)){const H=e.t=='hshift',g=gdef(e),SL=g.s,cols=H?g.h.x:[],pop=R.pop;
-  R.gear=null;R.lx=R.vx=50;R.ly=R.vy=50;R.col=null;R.held=null;R.act=0;R.ox=R.oy=0;let fx=0,fy=0;
+  R.gear=null;R.lx=R.vx=50;R.ly=R.vy=50;R.col=null;R.held=null;R.act=0;R.ox=R.oy=0;let px=0,py=0,pt=0;
   const key=l=>(e.km&&e.km[l])||'',lab=()=>{d.textContent=R.gear||(H?'H':'A')};lab();
   const press=l=>{const k=key(l);if(!k)return;send({t:'k',k,v:1});if(e.gm)R.held=k;else setTimeout(()=>send({t:'k',k,v:0}),70)};
   R.rel=()=>{if(R.held){send({t:'k',k:R.held,v:0});R.held=null}};
   const setGear=l=>{if(l===R.gear)return;R.rel();R.gear=l;lab();R.txs.forEach(x=>{const on=x.dataset.g==l;x.setAttribute('opacity',on?1:.55);x.setAttribute('font-size',on?11:9)});
-   if(l){const p=SL.find(q=>q[0]==l);if(p){R.lx=p[1];R.ly=p[2]}}if(S.hap&&A)A.vibrate(l?30:15);press(l||'N')};
+   if(l){const p=SL.find(q=>q[0]==l);if(p){R.lx=p[1];R.ly=p[2]}}if(S.hap&&A)A.vibrate(l?35:18);press(l||'N')};
   const near=x=>{let b=0;cols.forEach((c,i)=>{if(Math.abs(c-x)<Math.abs(cols[b]-x))b=i});return b};
-  const sy=(i,top)=>top?(g.h.t[i]?22:50):(g.h.b[i]?78:50);
+  const sly=(i,top)=>top?(g.h.t[i]?22:50):(g.h.b[i]?78:50);
+  const nb=e.gn,eg=e.ge,ej=Math.max(nb+2,eg-e.gr);
   const cons=(x,y)=>{
-   if(!H){x=cl(x,8,92);y=cl(y,8,92);let b=null,bd=1e9;SL.forEach(p=>{const q=Math.hypot(p[1]-x,p[2]-y);if(q<bd){bd=q;b=p}});if(bd<=11&&b[0]!=R.gear)setGear(b[0]);return[x,y]}
-   if(R.col==null){x=cl(x,cols[0],cols[cols.length-1]);if(Math.abs(y-50)<=9)return[x,cl(y,41,59)];R.col=near(x)}
-   const i=R.col,cx=cols[i],top=y<50,lim=sy(i,top);y=cl(y,Math.min(50,lim),Math.max(50,lim));
-   if(!R.gear&&Math.abs(y-50)<=6){R.col=null;return[cx,cl(y,41,59)]}
+   if(!H){x=cl(x,8,92);y=cl(y,8,92);let b=null,bd=1e9;SL.forEach(p=>{const q=Math.hypot(p[1]-x,p[2]-y);if(q<bd){bd=q;b=p}});if(bd<=11&&b[0]!=R.gear)setGear(b[0]);return[x,y,1]}
+   if(R.col==null){const x0=cl(x,cols[0],cols[cols.length-1]);if(Math.abs(y-50)<=nb)return[x0,cl(y,50-nb,50+nb),1];R.col=near(x0)}
+   const i=R.col,cx=cols[i],top=y<50,lim=sly(i,top);y=cl(y,Math.min(50,lim),Math.max(50,lim));
    const off=Math.abs(y-50),s=top?g.h.t[i]:g.h.b[i];
-   if(!R.gear&&s&&off>=22)setGear(s);else if(R.gear&&off<=16)setGear(null);
-   return[cx,y]};
-  R.step=dt=>{let tx=R.lx,ty=R.ly;if(R.gear){const p=SL.find(q=>q[0]==R.gear);if(p){tx=p[1];ty=p[2]}}const a=1-Math.exp(-dt/.045);R.vx+=(tx-R.vx)*a;R.vy+=(ty-R.vy)*a;R.lv.setAttribute('cx',R.vx);R.lv.setAttribute('cy',R.vy)};
-  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');popPos(e,R);pop.classList.add('show');fx=ev.clientX;fy=ev.clientY;R.bx=R.lx;R.by=R.ly;R.ox=R.oy=0;R.act=1;if(S.hap&&A)A.vibrate(10)};
-  d.onpointermove=ev=>{if(!R.act)return;const k=100/pop.getBoundingClientRect().width,tx=R.bx+(ev.clientX-fx)*k+R.ox,ty=R.by+(ev.clientY-fy)*k+R.oy,[cx,cy]=cons(tx,ty);R.ox+=cx-tx;R.oy+=cy-ty;R.lx=cx;R.ly=cy};
+   if(!R.gear&&off<=nb){R.col=null;return[cx,cl(y,50-nb,50+nb),0]}
+   if(!R.gear&&s&&off>=eg)setGear(s);else if(R.gear&&off<=ej)setGear(null);
+   return[cx,y,0]};
+  R.step=dt=>{let tx=R.lx,ty=R.ly;if(R.gear){const p=SL.find(q=>q[0]==R.gear);if(p){tx=p[1];ty=p[2]}}const a=1-Math.exp(-dt/Math.max(.001,e.gl*.0012));R.vx+=(tx-R.vx)*a;R.vy+=(ty-R.vy)*a;R.lv.setAttribute('cx',R.vx);R.lv.setAttribute('cy',R.vy)};
+  d.onpointerdown=ev=>{d.setPointerCapture(ev.pointerId);d.classList.add('on');popPos(e,R);pop.classList.add('show');px=R.fx0=ev.clientX;py=R.fy0=ev.clientY;pt=ev.timeStamp;R.bx=R.lx;R.by=R.ly;R.ox=R.oy=0;R.act=1;if(S.hap&&A)A.vibrate(12)};
+  d.onpointermove=ev=>{if(!R.act)return;const dt=Math.max(1,ev.timeStamp-pt);pt=ev.timeStamp;const a=e.gf>0?1-Math.exp(-dt/(e.gf*.8)):1;px+=(ev.clientX-px)*a;py+=(ev.clientY-py)*a;
+   const k=100/pop.getBoundingClientRect().width*e.gg,tx=R.bx+(px-R.fx0)*k+R.ox,ty=R.by+(py-R.fy0)*k+R.oy,[cx,cy,ab]=cons(tx,ty);if(ab)R.ox+=cx-tx;R.oy+=cy-ty;R.lx=cx;R.ly=cy};
   d.onpointerup=d.onpointercancel=()=>{R.act=0;d.classList.remove('on');pop.classList.remove('show')}}
  else if(e.t=='tilt'){const wh=d.firstChild,rg=e.p1||35;R.base=null;R.tgt=0;
   R.step=axisCtl(e,R,()=>[R.tgt,0]);
-  R.tl=a=>{if(R.base==null)R.base=a;const dl=((a-R.base+540)%360)-180;R.tgt=cl(dl/rg,-1,1)*(e.inv?-1:1);wh.style.transform=`rotate(${R.tgt*rg}deg)`};
-  d.onpointerdown=()=>{R.base=null}}}
-window.onTilt=(ax,ay)=>{const a=Math.atan2(ay,ax)*180/Math.PI;for(const id in RT)if(RT[id].tl)RT[id].tl(a)};
+  R.tl=a=>{R.tgt=cl(a/rg,-1,1)*(e.inv?-1:1);wh.style.transform=`rotate(${R.tgt*Math.abs(rg)}deg)`};
+  d.onpointerdown=()=>{if(A)A.tiltZero()}}}
+window.onTilt=a=>{for(const id in RT)if(RT[id].tl)RT[id].tl(a)};
 /* ---- gearbox popup ---- */
 function gdef(e){if(e.t=='hshift'){const h=HT[e.gt]||HT[0],s=[];h.x.forEach((x,i)=>{if(h.t[i])s.push([h.t[i],x,22]);if(h.b[i])s.push([h.b[i],x,78])});return{h,s}}return{s:AT[e.gt]||AT[0]}}
 function gsvg(e){const g=gdef(e),H=e.t=='hshift';let h='<svg viewBox="0 0 100 100"><g stroke=currentColor stroke-width=2.2 fill=none stroke-linecap=round>';
@@ -173,6 +179,15 @@ function mkPop(e,R){const p=document.createElement('div');p.className='gp';p.inn
 function prev(){for(const id in RT){const R=RT[id];if(R.pop)R.pop.classList.remove('show','prev')}const e=ED&&ED.sel;if(e&&GEAR(e)&&RT[e.id]){const R=RT[e.id];R.pop.remove();mkPop(e,R);R.pop.classList.add('show','prev')}}
 function kmHtml(e){if(!GEAR(e))return'';const labs=e.t=='hshift'?[...new Set(gdef(e).s.map(p=>p[0]).concat('N'))]:gdef(e).s.map(p=>p[0]);
  return`<div class=km><div class=h>${t('keys')}: ${t('keyhint')}</div>${labs.map(l=>`<label><span>${l=='-'?'−':l}</span><input value="${esc(e.km[l]||'')}" oninput="ED.sel.km['${l}']=this.value"></label>`).join('')}</div>`}
+function toast(s){const x=document.createElement('div');x.className='ts';x.textContent=s;document.body.appendChild(x);setTimeout(()=>x.remove(),2800)}
+function bgm(){const b=ED.p.bg,m=$('#cm');m.hidden=false;m.innerHTML=`<div class=mb><div class=tabs><b style="flex:1">${t('bg')}</b><button class=pb onclick="cm(0)">✕</button></div>
+<label class=pr2><span>${t('c')}</span><input type=color value="${b.c}" oninput="bgSet('c',this.value)"></label>
+<label class=pr2><span>${t('bgf')}</span><select onchange="bgSet('fit',this.value)">${['contain','cover','fill'].map(x=>`<option value=${x} ${x==b.fit?'selected':''}>${t('f_'+x)}</option>`).join('')}</select></label>
+<label class=pr><span>${t('bgo')}</span><input type=range min=10 max=100 value=${b.op} oninput="bgSet('op',+this.value);this.nextElementSibling.textContent=this.value"><b>${b.op}</b></label>
+<input type=file id=bgf accept="image/*" onchange="bgLoad(this.files[0])" style="display:none">
+<button class="pb on" onclick="$('#bgf').click()">${t('bgi')}</button><button class=pb onclick="bgSet('img','');bgm()">${t('bgr')}</button><button class=pb onclick="bgSet('c','#000000');bgm()">${t('bgz')}</button><div id=ms></div></div>`}
+function bgSet(k,v){ED.p.bg[k]=v;applyBg(ED.p)}
+function bgLoad(f){if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);let u=c.toDataURL('image/webp',.85);if(u.indexOf('data:image/webp')!=0)u=c.toDataURL('image/png');bgSet('img',u);bgm()};im.onerror=()=>msg(t('fail'));im.src=r.result};r.readAsDataURL(f)}
 /* ---- editor ---- */
 const KEYS=['A','B','X','Y','LB','RB','LT','RT','BACK','START','LS','RS','UP','DOWN','LEFT','RIGHT'];
 function edit(id){const p=S.profs.find(x=>x.id==id);ED={id,p:JSON.parse(JSON.stringify(p)),sel:null,snap:0};view='edit';if(A)A.orient(true);$('#home').hidden=true;$('#pl').hidden=false;render(ED.p,true);bar()}
@@ -181,7 +196,7 @@ function editBind(e,d,R){let sx=null,sy,ox,oy;const q=v=>ED.snap?Math.round(v/2)
  d.onpointermove=ev=>{if(sx==null)return;e.x=q(cl(ox+(ev.clientX-sx)/innerWidth*100,0,100));e.y=q(cl(oy+(ev.clientY-sy)/innerHeight*100,0,100));R.sz();if(R.pop)popPos(e,R)};
  d.onpointerup=d.onpointercancel=()=>{sx=null}}
 function flds(e){const f=[];
- if(GEAR(e))f.push(['sel','gt','gt',e.t=='hshift'?[0,1,2]:[0,1],e.t=='hshift'?[t('h0'),t('h1'),t('h2')]:[t('a0'),t('a1')]],['rng','gs','gs',20,90,1],['col','gc','gc'],['sel','gp','gp',[0,1],[t('near'),t('ctr')]],['sel','gm','gm',[0,1],[t('pulse'),t('holdk')]]);else{f.push(e.t=='btn'?['txt','l','lbl']:['sel','k','ax',['L','R']]);if(e.t=='btn')f.push(['sel','k','key',KEYS])}
+ if(GEAR(e))f.push(['sel','gt','gt',e.t=='hshift'?[0,1,2]:[0,1],e.t=='hshift'?[t('h0'),t('h1'),t('h2')]:[t('a0'),t('a1')]],['rng','gs','gs',20,90,1],['col','gc','gc'],['sel','gp','gp',[0,1],[t('near'),t('ctr')]],['sel','gm','gm',[0,1],[t('pulse'),t('holdk')]],['rng','gg','gg',.4,2.5,.1],['rng','gf','gf',0,100,1],['rng','gl','gl',0,100,1],['rng','gn','gn',4,25,1],['rng','ge','ge',12,27,1],['rng','gr','gr',1,12,1]);else{f.push(e.t=='btn'?['txt','l','lbl']:['sel','k','ax',['L','R']]);if(e.t=='btn')f.push(['sel','k','key',KEYS])}
  if(e.t=='wheel')f.push(['sel','tx','tx',[0,1,2],[t('t0'),t('t1'),t('t2')]],['rng','p1','mx',40,360,5],['rng','sn','sn',.4,3,.1]);
  if(e.t=='tilt')f.push(['rng','p1','rng',10,90,1],['chk','inv','inv']);
  if(e.t=='slider')f.push(['chk','or','or']);
@@ -197,7 +212,7 @@ function ctl(e,[ty,k,l,a,b,s]){const v=e[k],n=t(l);
 function bar(){const b=$('#eb'),e=ED.sel,tp=e&&e.y<22;b.hidden=false;b.style.top=tp?'auto':'0';b.style.bottom=tp?'0':'auto';
  let h=`<input value="${esc(dn(ED.p))}" size=9 oninput="ED.p.name=this.value;delete ED.p.nk"><select id=at>${['btn','stick','wheel','tilt','slider','hshift','auto'].map(x=>`<option value=${x}>${t(x)}</option>`).join('')}</select><button onclick=addE()>＋</button>`;
  if(e)h+=`<button onclick=dupE()>⧉</button><button onclick=delE()>🗑</button>`;
- h+=`<button class="${ED.snap?'sv':''}" onclick=snapT()>▦</button><button class=sv onclick=saveE()>${t('save')}</button><button onclick=home()>✕</button>`+(ED.p.nk?`<button onclick=rstE()>${t('rst')}</button>`:`<button onclick=delP()>${t('del')}</button>`);b.innerHTML=h;
+ h+=`<button onclick=bgm()>🖼</button><button class="${ED.snap?'sv':''}" onclick=snapT()>▦</button><button class=sv onclick=saveE()>${t('save')}</button><button onclick=home()>✕</button>`+(ED.p.nk?`<button onclick=rstE()>${t('rst')}</button>`:`<button onclick=delP()>${t('del')}</button>`);b.innerHTML=h;
  const p=$('#ep');if(!e){p.hidden=true;prev();return}p.hidden=false;p.style.top=tp?'8px':'54px';p.style.left=e.x<50?'auto':'8px';p.style.right=e.x<50?'8px':'auto';
  p.innerHTML=flds(e).map(f=>ctl(e,f)).join('')+(e.t=='wheel'?`<div class=pre>${[0,1,2].map(i=>`<button onclick=preset(${i})>${t('p'+i)}</button>`).join('')}</div>`:'')+kmHtml(e);
  document.querySelectorAll('.el.sel').forEach(x=>x.classList.remove('sel'));RT[e.id].d.classList.add('sel');prev()}
@@ -205,15 +220,15 @@ function upd(f,v){const e=ED.sel;e[f]=v;if(f=='k'||f=='tx'||f=='or'){render(ED.p
 function preset(i){Object.assign(ED.sel,PRE[i]);bar()}
 function snapT(){ED.snap=ED.snap?0:1;bar()}
 function newEl(ty){const e={id:U(),t:ty,k:ty=='btn'?'A':'L',l:ty=='btn'?'●':'',x:50,y:50,w:{btn:11,stick:26,wheel:36,tilt:20,slider:40,hshift:11,auto:11}[ty],c:'#dddddd',p1:0};
- if(ty=='wheel')Object.assign(e,PRE[1]);if(ty=='tilt')Object.assign(e,{p1:35,sm:25,dz:3,cv:20});if(ty=='slider')Object.assign(e,{sm:20});if(ty=='hshift'||ty=='auto')Object.assign(e,GD(ty));return norm1(e)}
+ if(ty=='wheel')Object.assign(e,PRE[1]);if(ty=='tilt')Object.assign(e,{p1:35,sm:12,dz:2,cv:15});if(ty=='slider')Object.assign(e,{sm:20});if(ty=='hshift'||ty=='auto')Object.assign(e,GD(ty));return norm1(e)}
 function addE(){const e=newEl($('#at').value);ED.p.els.push(e);ED.sel=e;render(ED.p,true);bar()}
 function dupE(){const c=JSON.parse(JSON.stringify(ED.sel));c.id=U();c.x=cl(c.x+4,0,100);c.y=cl(c.y+4,0,100);ED.p.els.push(c);ED.sel=c;render(ED.p,true);bar()}
 function delE(){ED.p.els=ED.p.els.filter(x=>x!=ED.sel);ED.sel=null;render(ED.p,true);bar()}
-function saveE(){const i=S.profs.findIndex(x=>x.id==ED.id);S.profs[i]=ED.p;save();home()}
-function rstE(){ED.p=DEFS().find(x=>x.id==ED.id);ED.sel=null;render(ED.p,true);bar()}
+function saveE(){const i=S.profs.findIndex(x=>x.id==ED.id);S.profs[i]=ED.p;if(!save()){ED.p.bg.img='';save();toast(t('big'))}home()}
+function rstE(){ED.p=norm(DEFS().find(x=>x.id==ED.id));ED.sel=null;render(ED.p,true);bar()}
 function delP(){S.profs=S.profs.filter(x=>x.id!=ED.id);if(S.cur==ED.id)S.cur='ps';save();home()}
 function newP(){const m=$('#cm');m.hidden=false;m.innerHTML=`<div class=mb><div class=tabs><b style="flex:1">${t('pick')}</b><button class=pb onclick=cm(0)>✕</button></div><button class="pb big" onclick=mkP(0)>Xbox</button><button class="pb big" onclick=mkP(1)>PlayStation</button><button class="pb big" onclick=mkP(2)>Custom · ${t('empty')}</button></div>`}
-function mkP(i){const n=S.profs.filter(p=>!p.nk).length+1,p={id:U(),name:(i==2?'Custom ':i?'PS ':'Xbox ')+n,els:i==2?[]:lay(i?PS:XB,i,'stick')};S.profs.push(p);save();cm(0);edit(p.id)}
+function mkP(i){const n=S.profs.filter(p=>!p.nk).length+1,p={id:U(),name:(i==2?'Custom ':i?'PS ':'Xbox ')+n,els:i==2?[]:lay(i?PS:XB,i,'stick')};S.profs.push(norm(p));save();cm(0);edit(p.id)}
 function bk(){const m=$('#cm');m.hidden=false;m.innerHTML=`<div class=mb><div class=tabs><b style="flex:1">${t('bkp')}</b><button class=pb onclick=cm(0)>✕</button></div><textarea id=bt rows=6 style="width:100%;background:#111;color:#ddd;border:1px solid #444;border-radius:8px;font-size:11px">${esc(JSON.stringify(S.profs))}</textarea><div style="margin-top:8px"><button class="pb on" onclick="A&&A.share($('#bt').value)">${t('share')}</button><button class=pb onclick=imp()>${t('imp')}</button></div><div id=ms></div></div>`}
 function imp(){try{const p=JSON.parse($('#bt').value);if(!Array.isArray(p)||!p.every(x=>x.id&&Array.isArray(x.els)))throw 0;p.forEach(norm);S.profs=p;save();cm(0);home()}catch(e){msg(t('fail'))}}
 /* ---- connection ---- */

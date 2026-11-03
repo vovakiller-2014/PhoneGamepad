@@ -13,16 +13,20 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import org.json.JSONArray
@@ -34,12 +38,43 @@ class MainActivity : Activity() {
     private lateinit var web: WebView
     private var sock: BluetoothSocket? = null
     private var out: OutputStream? = null
+    private var fcb: ValueCallback<Array<Uri>>? = null
     private val spp = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
     private fun js(s: String) = runOnUiThread { web.evaluateJavascript(s, null) }
 
+    private var tBase: FloatArray? = null
+    private var tAcc0 = Float.NaN
+    private var tLast = 0L
+
     private val tl = object : SensorEventListener {
-        override fun onSensorChanged(e: SensorEvent) { js("onTilt(${e.values[0]},${e.values[1]})") }
+        override fun onSensorChanged(e: SensorEvent) {
+            val now = e.timestamp / 1_000_000
+            if (now - tLast < 12) return
+            tLast = now
+            val deg: Double
+            if (e.sensor.type == Sensor.TYPE_ACCELEROMETER) {
+                val a = Math.toDegrees(Math.atan2(e.values[1].toDouble(), e.values[0].toDouble()))
+                if (tAcc0.isNaN()) tAcc0 = a.toFloat()
+                var d = a - tAcc0
+                while (d > 180) d -= 360
+                while (d < -180) d += 360
+                deg = d
+            } else {
+                val v = e.values
+                val x = v[0]; val y = v[1]; val z = v[2]
+                val w = if (v.size > 3) v[3] else Math.sqrt(maxOf(0.0, 1.0 - x * x - y * y - z * z)).toFloat()
+                val b = tBase
+                if (b == null) { tBase = floatArrayOf(x, y, z, w); deg = 0.0 }
+                else {
+                    var qw = b[3] * w + b[0] * x + b[1] * y + b[2] * z
+                    var qz = b[3] * z - b[0] * y + b[1] * x - b[2] * w
+                    if (qw < 0) { qw = -qw; qz = -qz }
+                    deg = -Math.toDegrees(2.0 * Math.atan2(qz.toDouble(), qw.toDouble()))
+                }
+            }
+            js("onTilt($deg)")
+        }
         override fun onAccuracyChanged(s: Sensor?, a: Int) {}
     }
 
@@ -49,11 +84,16 @@ class MainActivity : Activity() {
     }
 
     inner class Bridge {
-        @JavascriptInterface fun vibrate(ms: Int) {
+        @JavascriptInterface fun vibrate(ms: Int) = runOnUiThread {
+            try {
+                val v = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                if (v.hasVibrator()) v.vibrate(VibrationEffect.createOneShot(maxOf(ms, 25).toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
+            } catch (_: Exception) {}
             try {
                 @Suppress("DEPRECATION")
-                (getSystemService(VIBRATOR_SERVICE) as Vibrator)
-                    .vibrate(VibrationEffect.createOneShot(ms.toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
+                window.decorView.performHapticFeedback(
+                    if (ms >= 20) HapticFeedbackConstants.LONG_PRESS else HapticFeedbackConstants.KEYBOARD_TAP,
+                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING or HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING)
             } catch (_: Exception) {}
         }
 
@@ -78,8 +118,16 @@ class MainActivity : Activity() {
         @JavascriptInterface fun tilt(on: Boolean) = runOnUiThread {
             val m = getSystemService(SENSOR_SERVICE) as SensorManager
             m.unregisterListener(tl)
-            if (on) m.registerListener(tl, m.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_GAME)
+            tBase = null; tAcc0 = Float.NaN
+            if (on) {
+                val s = m.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+                    ?: m.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+                    ?: m.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+                m.registerListener(tl, s, 10_000)
+            }
         }
+
+        @JavascriptInterface fun tiltZero() { tBase = null; tAcc0 = Float.NaN }
 
         @JavascriptInterface fun scanQr() = runOnUiThread {
             GmsBarcodeScanning.getClient(this@MainActivity).startScan()
@@ -135,6 +183,12 @@ class MainActivity : Activity() {
             overScrollMode = View.OVER_SCROLL_NEVER
             settings.javaScriptEnabled = true; settings.domStorageEnabled = true
             addJavascriptInterface(Bridge(), "Android")
+            webChromeClient = object : WebChromeClient() {
+                override fun onShowFileChooser(w: WebView?, cb: ValueCallback<Array<Uri>>?, p: WebChromeClient.FileChooserParams?): Boolean {
+                    fcb?.onReceiveValue(null); fcb = cb
+                    return try { startActivityForResult(p!!.createIntent(), 77); true } catch (_: Exception) { fcb = null; false }
+                }
+            }
             loadUrl("file:///android_asset/app.html")
         }
         setContentView(web, ViewGroup.LayoutParams(-1, -1))
@@ -163,6 +217,12 @@ class MainActivity : Activity() {
 
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun onBackPressed() { web.evaluateJavascript("window.onBack&&window.onBack()", null) }
+
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+    override fun onActivityResult(rc: Int, res: Int, data: Intent?) {
+        if (rc == 77) { fcb?.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(res, data)); fcb = null }
+        else super.onActivityResult(rc, res, data)
+    }
 
     override fun onDestroy() {
         (getSystemService(SENSOR_SERVICE) as SensorManager).unregisterListener(tl)
